@@ -1,0 +1,59 @@
+<resources>
+    <string name="app_name">Ghost Story</string>
+    <string name="story_types">故事类型</string>
+    <string name="about">关于</string>
+    <string name="settings">设置</string>
+    <string name="ghost_story">Ghost Story</string>
+    <string name="home">主页</string>
+    <string name="title_activity_settings_preference">SettingsPreferenceActivity</string>
+    <string name="loaded_fail">加载失败</string>
+    <string name="retry">重试</string>
+    <string-array name="type_names">
+        <item>短篇</item>
+        <item>长篇</item>
+        <item>校园</item>
+        <item>医院</item>
+        <item>家里</item>
+        <item>民间</item>
+        <item>灵异</item>
+        <item>原创</item>
+        <item>内涵</item>
+    </string-array>
+
+    <string name="action_add_to_bookmarks">添加到收藏</string>
+    <string name="action_delete_from_bookmarks">取消收藏</string>
+    <string name="action_copy_link">复制链接</string>
+    <string name="action_open_in_browser">在浏览器中打开</string>
+    <string name="action_copy_text">复制内容文本</string>
+    <string name="action_share_as_text">作为文本分享</string>
+    <string name="share_error">分享失败</string>
+    <string name="no_browser_found">没有找到浏览器</string>
+    <string name="copied_to_clipboard">已复制到粘贴板</string>
+    <string name="copied_to_clipboard_failed">复制失败</string>
+    <string name="added_to_bookmarks">已添加到收藏</string>
+    <string name="deleted_from_bookmarks">从收藏中删除</string>
+    <string name="link_error">链接失败</string>
+    <string name="share_extra">分享自鬼故事</string>
+    <string name="share_to">分享至</string>
+    <string name="loaded_fail_again">异常错误</string>
+    <string name="loading_more">正在加载...</string>
+    <string name="no_data">没有找到数据</string>
+    <string name="search_bookmarks">搜索收藏</string>
+    <string name="internet_error">链接错误</string>
+    <string name="horror_mode">恐怖模式</string>
+    <string name="safe_mode">胆小模式</string>
+    <string name="github_url">https://github.com/EL113</string>
+    <string name="send_to">mailto:yesongdh@gmail.com</string>
+    <string name="mail_topic">反馈与建议</string>
+    <string name="device_model">设备型号:</string>
+    <string name="sdk_version">SDK版本:</string>
+    <string name="version">版本：V1.0</string>
+    <string name="donate">捐助</string>
+    <string name="donate_content">支付宝账号已复制，进入支付宝粘贴转账即可</string>
+    <string name="postive">确定</string>
+    <string name="donate_account">15751005186</string>
+    <string name="negative">取消</string>
+    <string name="change_mode">切换模式</string>
+    <string name="max_page_error">没有更多了哟</string>
+    <string name="link_copied">链接已复制</string>
+</resources>

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <group
+        android:checkableBehavior="single"
+        android:id="@+id/group_main">
+        <item
+            android:id="@+id/nav_home"
+            android:icon="@drawable/ic_home_black_24dp"
+            android:title="@string/home" />
+        <item
+            android:id="@+id/nav_types"
+            android:icon="@drawable/ic_list_black_24dp"
+            android:title="@string/story_types" />
+    </group>
+
+    <group
+        android:checkableBehavior="single"
+        android:id="@+id/group_second">
+        <item
+            android:id="@+id/nav_theme"
+            android:icon="@drawable/ic_settings_black_24dp"
+            android:title="@string/change_mode" />
+        <item
+            android:id="@+id/nav_about"
+            android:icon="@drawable/ic_info_black_24dp"
+            android:title="@string/about" />
+        <item
+            android:id="@+id/sweep_cache"
+            android:icon="@drawable/ic_delete_sweep_black_24dp"
+            android:title="清除缓存" />
+    </group>
+</menu>
