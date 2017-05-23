@@ -104,7 +104,7 @@ public class DetailFragment extends Fragment implements DetailContract.View {
         DetailActivity activity = (DetailActivity) getActivity();
         activity.setSupportActionBar((Toolbar) view.findViewById(R.id.detail_toolbar));
         activity.getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        activity.getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_arrow_back_black_24dp);
+        activity.getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_arrow_back_white_24dp);
     }
 
     @Override
@@ -127,6 +127,7 @@ public class DetailFragment extends Fragment implements DetailContract.View {
 
                 if (presenter.queryIfIsBookmarked()) {
                     ((TextView) view.findViewById(R.id.bookmarks_text)).setText(R.string.action_delete_from_bookmarks);
+
                     ((ImageView) view.findViewById(R.id.bookmarks_image))
                             .setImageResource(R.drawable.ic_star_border_black_24dp);
                 }

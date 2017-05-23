@@ -55,7 +55,7 @@ public class RecommendationsFragment extends Fragment implements Recommendations
 
         });
 
-        recyclerView.setOnScrollListener(new RecyclerView.OnScrollListener() {
+        recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
 
             boolean isSlidingToLast = false;
 
@@ -150,6 +150,7 @@ public class RecommendationsFragment extends Fragment implements Recommendations
             public void run() {
                 if (adapter == null) {
                     adapter = new RecommendationsAdapter(getActivity(), list);
+                    //把类OnRecyclerViewOnClickListener（）这个函数传进去，即数据处理方式的指针，真正的处理方式在setItemClickListener（）函数中实现
                     adapter.setItemClickListener(new OnRecyclerViewOnClickListener() {
                         @Override
                         public void OnItemClicked(View view, int position) {

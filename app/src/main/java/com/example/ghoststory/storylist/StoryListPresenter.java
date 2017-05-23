@@ -36,42 +36,49 @@ public class StoryListPresenter implements StoryListContract.Presenter{
     private Context context;
     private StoryListContract.View view;
     private String typeId;
-    private String page;
+    private int page;
     private String now;
-    private List<DbContentList> dataList = new ArrayList<>();
-    private DbContentList content;
+    private List<DbContentList> dataList = new ArrayList<>();//请求的所有数据
+    private DbContentList content;//请求的一条数据
 
     public StoryListPresenter(Context context, StoryListContract.View view) {
         this.context = context;
         this.view = view;
         this.view.setPresenter(this);
     }
+
+    /**
+     * 用于请求数据
+     * @param typeId 故事类型
+     * @param page 请求的页码
+     * @param clearing 是否刷新，刷新就会清除掉之前的所有数据
+     */
     @Override
-    public void loadPost(final String typeId, String page,final boolean clearing) {
+    public void loadPost(final String typeId, int page,final boolean clearing) {
         if (clearing) {
             view.startLoading();
         }
-
-        API api = new API();
+        //获取当前时间
         getNow();
 
-        final String url = api.STORY_LIST + "page=" + page + api.API_ID + now + "&type=" + typeId + api.API_SIGN;
+        final String url = API.STORY_LIST + "page=" + page + API.API_ID + now + "&type=" + typeId + API.API_SIGN;
         if (NetworkState.networkConnected(context)) {
             HttpUtil.sendOkHttpRequest(url, new Callback() {
                 @Override
                 public void onFailure(Call call, IOException e) {
                     view.showError();
-                    view.startLoading();
+                    view.stopLoading();
                 }
                 @Override
                 public void onResponse(Call call, Response response) throws IOException {
                     String responseText = response.body().string();
-
+                    //解析数据
                     RequestResult requestResult = Utility.handleStoryListData(responseText);
+                    //如果要刷新，就清除之前数据
                     if (clearing) {
                         dataList.clear();
                     }
-
+                    //解析出的数据为空，就报错
                     if (requestResult == null) {
                         view.stopLoading();
                         view.showError();
@@ -88,6 +95,7 @@ public class StoryListPresenter implements StoryListContract.Presenter{
                     }
 
                     for (ContentList item : responseList) {
+                        //先查看这条数据是否在本地数据库存在，如果存在就从本地数据库取出，如果不存在就添加进本地数据库
                         if (!queryIfIDExists(item.getId())) {
                             content = new DbContentList();
                             content.setIdContent(item.getId());
@@ -111,13 +119,17 @@ public class StoryListPresenter implements StoryListContract.Presenter{
                 }
             });
         }else {
-        if (clearing) {
-            dataList.clear();
-            dataList = DataSupport.where("typeName=?",typeId).find(DbContentList.class);
-        }
+            //如果请求数据失败
+            //如果是下拉刷新，就清除掉之前数据，并数据库请求所有数据
+            if (clearing) {
+                dataList.clear();
+                dataList = DataSupport.where("typeName=?", typeId).find(DbContentList.class);
+            }
+            //显示出错
+            view.showError();
         }
     }
-
+    //刷新动作
     @Override
     public void refresh() {
         start();
@@ -125,11 +137,13 @@ public class StoryListPresenter implements StoryListContract.Presenter{
 
     @Override
     public void start() {
+        //随机加载某一页
         Random random = new Random();
-        page = String.valueOf(random.nextInt(50)+1);
+        page = random.nextInt(50)+1;
         loadPost(typeId,page,true);
     }
 
+    //进入详情页面时，要传递信息过去
     @Override
     public void startReading(int position) {
         context.startActivity(new Intent(context, DetailActivity.class)
@@ -137,12 +151,12 @@ public class StoryListPresenter implements StoryListContract.Presenter{
                 .putExtra("title", dataList.get(position).getTitle())
                 .putExtra("image", dataList.get(position).getImg())
                 .putExtra("link", dataList.get(position).getLink()));
-
     }
 
+    //加载下一页
     @Override
     public void loadMore() {
-        loadPost(typeId,page+1,false);
+        loadPost(typeId, ++page, false);
     }
 
     public void getNow() {

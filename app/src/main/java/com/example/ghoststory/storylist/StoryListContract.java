@@ -26,7 +26,7 @@ public class StoryListContract {
 
         void refresh();
 
-        void loadPost(String id,String page,final boolean clearing);
+        void loadPost(String id,int page,final boolean clearing);
 
         void startReading(int position);
 

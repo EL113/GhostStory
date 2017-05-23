@@ -50,7 +50,6 @@ public class RecommendationsPresenter implements RecommendationsContract.Present
         this.context = context;
         this.view = view;
         this.view.setPresenter(this);
-
     }
 
     @Override
@@ -61,6 +60,7 @@ public class RecommendationsPresenter implements RecommendationsContract.Present
         int typeNumber = random2.nextInt(8);
         typeName = typeNames[typeNumber];
         loadPosts(page, typeName, true);
+        view.stopLoading();
     }
 
     @Override
@@ -70,11 +70,9 @@ public class RecommendationsPresenter implements RecommendationsContract.Present
             view.showLoading();
         }
 
-        API api = new API();
-
         getNow();
 
-        url = api.STORY_LIST + "page=" + String.valueOf(page) + api.API_ID + now + "&type=" + type + api.API_SIGN;
+        url = API.STORY_LIST + "page=" + String.valueOf(page) + API.API_ID + now + "&type=" + type + API.API_SIGN;
 
         if (NetworkState.networkConnected(context)) {
             new Thread(new Runnable() {
@@ -141,8 +139,8 @@ public class RecommendationsPresenter implements RecommendationsContract.Present
             if (clearing) {
                 list.clear();
                 list = DataSupport.where("typeName = ?","recommendations").find(DbContentList.class);
-                view.stopLoading();
                 view.showResults(list);
+                view.stopLoading();
             } else {
                 view.showError();
             }

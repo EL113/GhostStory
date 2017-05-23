@@ -93,7 +93,7 @@ public class SearchFragment extends Fragment implements SearchContract.View{
         Toolbar toolbar = (Toolbar) view.findViewById(R.id.search_toolbar);
         ((SearchActivity)(getActivity())).setSupportActionBar(toolbar);
         ((SearchActivity)(getActivity())).getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        ((SearchActivity) (getActivity())).getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_arrow_back_black_24dp);
+        ((SearchActivity) (getActivity())).getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_arrow_back_white_24dp);
 
         searchView = (SearchView) view.findViewById(R.id.search_view);
         progressBar = (ProgressBar) view.findViewById(R.id.progressbar);

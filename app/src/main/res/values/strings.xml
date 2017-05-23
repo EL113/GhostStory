@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Ghost Story</string>
+    <string name="app_name">夜半故事</string>
     <string name="story_types">故事类型</string>
     <string name="about">关于</string>
     <string name="settings">设置</string>

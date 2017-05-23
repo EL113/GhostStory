@@ -27,7 +27,7 @@ public class AboutPreferenceActivity extends AppCompatActivity {
     public void initView() {
 
         setSupportActionBar((Toolbar)findViewById(R.id.about_toolbar));
-        getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_arrow_back_black_24dp);
+        getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_arrow_back_white_24dp);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
     }
 

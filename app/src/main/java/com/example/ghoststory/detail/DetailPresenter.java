@@ -58,6 +58,7 @@ public class DetailPresenter implements DetailContract.Presenter{
             currentPage = item.getCurrentPage();
             allPages = Integer.valueOf(item.getMaxPage());
             view.setData(item.getTitle(), item.getImg(), textDetail);
+            view.stopLoading();
         } else {
             loadPost("1");
         }
@@ -87,7 +88,8 @@ public class DetailPresenter implements DetailContract.Presenter{
                                 allPages = detailResult.getDetailBody().getAllPages();
                                 currentPage = detailResult.getDetailBody().getCurrentPage();
                                 String queryText = detailResult.getDetailBody().getText();
-                                textDetail = textDetail + "\n"+ queryText;
+                                StringBuilder textBuilder = new StringBuilder(textDetail);
+                                textDetail = textBuilder.append(queryText).toString();
 
                                 DbContentList updateItem = new DbContentList();
                                 updateItem.setCurrentPage(currentPage);

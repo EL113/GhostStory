@@ -49,6 +49,7 @@ public class RecommendationsAdapter extends RecyclerView.Adapter<RecyclerView.Vi
         @Override
         public void onClick(View v) {
             if (listener != null) {
+                //
                 listener.OnItemClicked(v, getLayoutPosition());
             }
         }

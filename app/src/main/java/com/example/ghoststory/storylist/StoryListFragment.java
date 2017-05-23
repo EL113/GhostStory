@@ -29,6 +29,7 @@ public class StoryListFragment extends Fragment implements StoryListContract.Vie
     private StoryListContract.Presenter presenter;
     private RecommendationsAdapter adapter;
 
+    //单例设计模式
     public static StoryListFragment newInstance() {
         return new StoryListFragment();
     }
@@ -37,30 +38,30 @@ public class StoryListFragment extends Fragment implements StoryListContract.Vie
     public View onCreateView(LayoutInflater inflater, ViewGroup container,Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.frag_story_list_layout, container, false);
         initView(view);
-
-        recyclerView.setOnScrollListener(new RecyclerView.OnScrollListener() {
-
+        //添加recyclerview的滑动监听
+        recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            //是否滑动到最后一项，以便加载更多
             boolean isSlidingToLast = false;
-
+            //滑动状态改变时
             @Override
             public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
 
                 LinearLayoutManager manager = (LinearLayoutManager) recyclerView.getLayoutManager();
-                // 当不滚动时，如果既不滚动也滚动到最后了就继续加载后一页的数据；
+                // 如果新状态是不滑动，并且最后一个完全显示的item的位置编号等于总item数-1就说明滑动到底部了
                 if (newState == RecyclerView.SCROLL_STATE_IDLE) {
-                    // 获取最后一个完全显示的item position
+                    // 获取最后一个完全显示的item 的位置和所有的item数量
                     int lastVisibleItem = manager.findLastCompletelyVisibleItemPosition();
                     int totalItemCount = manager.getItemCount();
 
-                    // 判断是否滚动到底部并且是向下滑动,就加载更多
+                    // 判断最后一个完全显示的item的位置编号是否等于总item数-1，并且是向下滑动
                     if (lastVisibleItem == (totalItemCount - 1) && isSlidingToLast) {
-                        presenter.loadMore();
+                        presenter.loadMore(); //是就说明滑动到底部，可以加载更多
                     }
                 }
 
                 super.onScrollStateChanged(recyclerView, newState);
             }
-
+            //通过滑动时的dy正负来判断是否是向下滑动
             @Override
             public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
                 super.onScrolled(recyclerView, dx, dy);
@@ -71,11 +72,16 @@ public class StoryListFragment extends Fragment implements StoryListContract.Vie
         return view;
     }
 
+    /**
+     * 实例化视图上的控件，并设置各种监听
+     * @param view 加载的视图
+     */
     @Override
     public void initView(View view) {
         refresh = (SwipeRefreshLayout) view.findViewById(R.id.frag_story_list_refresh);
         recyclerView = (RecyclerView) view.findViewById(R.id.frag_story_list_recycler);
 
+        //设置向下刷新时时出现的progressbar的颜色
         refresh.setColorSchemeResources(R.color.colorPrimary);
         refresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
@@ -86,6 +92,7 @@ public class StoryListFragment extends Fragment implements StoryListContract.Vie
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
     }
 
+    //显示出错
     @Override
     public void showError() {
         getActivity().runOnUiThread(new Runnable() {
@@ -101,7 +108,7 @@ public class StoryListFragment extends Fragment implements StoryListContract.Vie
             }
         });
     }
-
+    //加载数据，向adapter里面填充数据
     @Override
     public void showResults(final List<DbContentList> lists) {
 
@@ -123,7 +130,7 @@ public class StoryListFragment extends Fragment implements StoryListContract.Vie
             }
         });
     }
-
+    //通知控件刷新状态已经改变，可以开始刷新了
     @Override
     public void startLoading() {
         getActivity().runOnUiThread(new Runnable() {
@@ -139,7 +146,7 @@ public class StoryListFragment extends Fragment implements StoryListContract.Vie
         });
 
     }
-
+    //通知控件刷新状态已经改变，停止刷新
     @Override
     public void stopLoading() {
         getActivity().runOnUiThread(new Runnable() {
