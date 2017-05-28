@@ -1,8 +1,8 @@
 <component name="libraryTable">
   <library name="preference-v14-25.2.0">
     <CLASSES>
-      <root url="jar://$PROJECT_DIR$/app/build/intermediates/exploded-aar/com.android.support/preference-v14/25.2.0/jars/classes.jar!/" />
-      <root url="file://$PROJECT_DIR$/app/build/intermediates/exploded-aar/com.android.support/preference-v14/25.2.0/res" />
+      <root url="file://$USER_HOME$/.android/build-cache/ebe895a2f70b51d6be1f35701842f67c7a84a731/output/res" />
+      <root url="jar://$USER_HOME$/.android/build-cache/ebe895a2f70b51d6be1f35701842f67c7a84a731/output/jars/classes.jar!/" />
     </CLASSES>
     <JAVADOC />
     <SOURCES>
