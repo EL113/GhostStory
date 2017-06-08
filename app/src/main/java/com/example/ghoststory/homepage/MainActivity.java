@@ -41,10 +41,10 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
+        //设置控件
         initView();
 
-        //从缓存中加载碎片数据或直接创建，并把碎片放进碎片管理中，方便之后隐藏和显示碎片；
+        //如果缓存不为空，则说明之前的碎片对象还在碎片管理中，可以从碎片管理中直接获取碎片对象，或者直接创建碎片对象
         if (savedInstanceState != null) {
             mainFragment = (MainFragment) getSupportFragmentManager()
                     .getFragment(savedInstanceState, "MainFragment");
@@ -54,23 +54,20 @@ public class MainActivity extends AppCompatActivity {
             mainFragment = MainFragment.newInstance();
             storyTypesFragment = StoryTypesFragment.newInstance();
         }
-
+        //把碎片对象和布局联系起来，并添加到碎片管理中
         if (!mainFragment.isAdded()) {
             getSupportFragmentManager().beginTransaction()
                     .add(R.id.layout_fragment, mainFragment, "MainFragment")
                     .commit();
         }
-
         if (!storyTypesFragment.isAdded()) {
             getSupportFragmentManager().beginTransaction()
                     .add(R.id.layout_fragment, storyTypesFragment, "StoryTypesFragment")
                     .commit();
         }
-
+        //给碎片的presenter传递上下文
         new StoryTypesPresenter(MainActivity.this, storyTypesFragment);
-
-
-
+        //导航菜单的check事件，通过intent事件的动作来判断
         String action = getIntent().getAction();
         if (action.equals(ACTION_STORY_TYPES)) {
             navigationView.setCheckedItem(R.id.nav_types);
@@ -79,20 +76,20 @@ public class MainActivity extends AppCompatActivity {
             navigationView.setCheckedItem(R.id.nav_home);
             showMainFragment();
         }
-
     }
-
+    //设置控件
     private void initView() {
+        //设置标题栏
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-
+        //添加标题栏的返回按钮
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
             actionBar.setDisplayHomeAsUpEnabled(true);
             actionBar.setHomeAsUpIndicator(R.drawable.ic_menu_white_24dp);
         }
-
+        //导航菜单的各种点击事件
         navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
             @Override
@@ -109,6 +106,7 @@ public class MainActivity extends AppCompatActivity {
                         startActivity(new Intent(MainActivity.this, AboutPreferenceActivity.class));
                         break;
                     case R.id.nav_theme:
+                        //夜间模式的切换
                         int mode = getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK;
 
                         if(mode == Configuration.UI_MODE_NIGHT_YES) {
@@ -116,6 +114,7 @@ public class MainActivity extends AppCompatActivity {
                         } else if(mode == Configuration.UI_MODE_NIGHT_NO) {
                             AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
                         }
+                        //设置窗口改变的动画效果
                         getWindow().setWindowAnimations(R.style.WindowAnimationFadeInOut);
                         recreate();
                         break;
