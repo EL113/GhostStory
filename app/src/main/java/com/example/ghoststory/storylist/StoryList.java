@@ -16,7 +16,7 @@ import android.view.View;
 
 import com.example.ghoststory.R;
 import com.example.ghoststory.db.DbContentList;
-import com.example.ghoststory.service.CacheService;
+
 
 import org.litepal.crud.DataSupport;
 

@@ -23,16 +23,8 @@
             </intent-filter>
         </activity>
 
-        <service
-            android:name=".service.CacheService"
-            android:enabled="true"
-            android:exported="true" />
-
         <activity
             android:name=".about.AboutPreferenceActivity"
-            android:theme="@style/AppTheme.NoActionBar" />
-        <activity
-            android:name=".settings.SettingsPreferenceActivity"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".detail.DetailActivity"

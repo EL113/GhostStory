@@ -21,8 +21,7 @@ import android.view.View;
 import com.example.ghoststory.R;
 import com.example.ghoststory.about.AboutPreferenceActivity;
 import com.example.ghoststory.db.DbContentList;
-import com.example.ghoststory.service.CacheService;
-import com.example.ghoststory.settings.SettingsPreferenceActivity;
+
 
 import org.litepal.crud.DataSupport;
 
