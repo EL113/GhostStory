@@ -109,12 +109,4 @@ public class SearchFragment extends Fragment implements SearchContract.View{
             this.presenter = presenter;
         }
     }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        if (item.getItemId() == android.R.id.home) {
-            getActivity().finish();
-        }
-        return super.onOptionsItemSelected(item);
-    }
 }
