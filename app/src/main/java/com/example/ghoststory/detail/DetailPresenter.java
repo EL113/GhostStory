@@ -117,7 +117,7 @@ public class DetailPresenter implements DetailContract.Presenter{
     public void loadMore() {
         int nowPage = Integer.valueOf(currentPage);
         if (nowPage < allPages) {
-            loadPost(String.valueOf(nowPage + 1));
+            loadPost(String.valueOf(nowPage ++));
         } else {
             view.showMaxPage();
         }
