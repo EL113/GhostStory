@@ -105,10 +105,10 @@ public class MainActivity extends AppCompatActivity {
                     case R.id.nav_about:
                         startActivity(new Intent(MainActivity.this, AboutPreferenceActivity.class));
                         break;
-                    case R.id.nav_theme:
-                        //夜间模式的切换
+                    case R.id.nav_theme://夜间模式的切换
+                        //检测当前主题是否是夜间模式
                         int mode = getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK;
-
+                        //如果当前模式是夜间模式，则关闭夜间模式
                         if(mode == Configuration.UI_MODE_NIGHT_YES) {
                             AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
                         } else if(mode == Configuration.UI_MODE_NIGHT_NO) {
@@ -133,9 +133,8 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-
+    //显示主碎片，并设置标题内容
     private void showMainFragment() {
-
         FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
         fragmentTransaction.show(mainFragment);
         ;
@@ -144,7 +143,7 @@ public class MainActivity extends AppCompatActivity {
 
         toolbar.setTitle(getResources().getString(R.string.app_name));
     }
-
+    //显示类型碎片，并设置标题内容
     private void showTypesFragment() {
         FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
         fragmentTransaction.show(storyTypesFragment);
@@ -153,7 +152,7 @@ public class MainActivity extends AppCompatActivity {
 
         toolbar.setTitle(getResources().getString(R.string.story_types));
     }
-
+    //在退出时，删除头五条没有收藏的数据
     @Override
     protected void onDestroy() {
         super.onDestroy();
@@ -167,11 +166,9 @@ public class MainActivity extends AppCompatActivity {
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
     }
-
-
+    //把已经添加好的主碎片和故事列表碎片保存到碎片管理中
     @Override
     public void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
         super.onSaveInstanceState(outState);
         if (mainFragment.isAdded()) {
             getSupportFragmentManager().putFragment(outState, "MainFragment", mainFragment);
@@ -189,7 +186,7 @@ public class MainActivity extends AppCompatActivity {
         }
         return false;
     }
-
+    //组合出符合条件的当前时间
     public void getNow() {
         Calendar c = Calendar.getInstance();
 

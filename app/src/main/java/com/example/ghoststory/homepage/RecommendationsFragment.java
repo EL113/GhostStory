@@ -96,7 +96,6 @@ public class RecommendationsFragment extends Fragment implements Recommendations
         refresh = (SwipeRefreshLayout) view.findViewById(R.id.refreshLayout);
         //设置下拉刷新的按钮的颜色
         refresh.setColorSchemeResources(R.color.colorPrimary);
-
     }
 
     @Override

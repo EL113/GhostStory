@@ -14,7 +14,6 @@ public interface StoryTypesContract {
 
     interface View extends BaseView<Presenter> {
         void setTypes(List<StoryType> list);
-
     }
 
     interface Presenter extends BasePresenter {
