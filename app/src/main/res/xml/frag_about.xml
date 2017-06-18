@@ -2,9 +2,12 @@
 <android.support.v7.preference.PreferenceScreen
     xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <android.support.v7.preference.PreferenceCategory android:title="@string/app_name">
+    <android.support.v7.preference.PreferenceCategory android:title="名称"
+        android:summary="@string/app_name">
 
-        <android.support.v7.preference.Preference android:title="版本号" />
+        <android.support.v7.preference.Preference android:title="版本号"
+            android:key="version"
+            android:summary="v 1.0"/>
 
         <android.support.v7.preference.Preference android:title="为应用评分"
             android:key="rate"

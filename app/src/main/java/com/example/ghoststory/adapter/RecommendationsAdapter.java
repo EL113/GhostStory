@@ -49,7 +49,7 @@ public class RecommendationsAdapter extends RecyclerView.Adapter<RecyclerView.Vi
         @Override
         public void onClick(View v) {
             if (listener != null) {
-                //
+                //实现预设接口的动作
                 listener.OnItemClicked(v, getLayoutPosition());
             }
         }
