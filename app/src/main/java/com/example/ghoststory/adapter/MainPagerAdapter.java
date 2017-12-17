@@ -14,7 +14,6 @@ import com.example.ghoststory.homepage.RecommendationsFragment;
 
 public class MainPagerAdapter extends FragmentPagerAdapter {
     private String[] titles;
-    private final Context context;
 
     private RecommendationsFragment recommendationsFrag;
     private BookmarksFragment bookmarksFrag;
@@ -28,17 +27,12 @@ public class MainPagerAdapter extends FragmentPagerAdapter {
     }
 
     public MainPagerAdapter(FragmentManager fm,
-                            Context context,
                             RecommendationsFragment recommendationsFrag,
-                            BookmarksFragment bookmarksFrag
-    ) {
+                            BookmarksFragment bookmarksFrag) {
         super(fm);
-        this.context = context;
         titles = new String[] {"推荐", "收藏"};
-
         this.recommendationsFrag = recommendationsFrag;
         this.bookmarksFrag = bookmarksFrag;
-
     }
 
     @Override

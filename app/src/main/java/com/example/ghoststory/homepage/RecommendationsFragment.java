@@ -1,6 +1,5 @@
 package com.example.ghoststory.homepage;
 
-import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
@@ -11,11 +10,9 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 
 import com.example.ghoststory.R;
 import com.example.ghoststory.adapter.RecommendationsAdapter;
-import com.example.ghoststory.bean.ContentList;
 import com.example.ghoststory.db.DbContentList;
 import com.example.ghoststory.interfaze.OnRecyclerViewOnClickListener;
 
@@ -31,7 +28,6 @@ public class RecommendationsFragment extends Fragment implements Recommendations
     private RecommendationsContract.Presenter presenter;
     private RecommendationsAdapter adapter;
 
-
     public static RecommendationsFragment newInstance() {
         return new RecommendationsFragment();
     }
@@ -43,11 +39,10 @@ public class RecommendationsFragment extends Fragment implements Recommendations
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_bookmarks_list, container, false);
+        View view = inflater.inflate(R.layout.fragment_mian_list, container, false);
         initView(view);
         presenter.start();
         refresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
-
             @Override
             public void onRefresh() {
                 presenter.start();
@@ -56,7 +51,6 @@ public class RecommendationsFragment extends Fragment implements Recommendations
         });
 
         recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
-
             boolean isSlidingToLast = false;
 
             @Override
@@ -94,7 +88,6 @@ public class RecommendationsFragment extends Fragment implements Recommendations
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
 
         refresh = (SwipeRefreshLayout) view.findViewById(R.id.refreshLayout);
-        //设置下拉刷新的按钮的颜色
         refresh.setColorSchemeResources(R.color.colorPrimary);
     }
 
@@ -123,7 +116,6 @@ public class RecommendationsFragment extends Fragment implements Recommendations
 
     @Override
     public void showLoading() {
-
         refresh.post(new Runnable() {
             @Override
             public void run() {

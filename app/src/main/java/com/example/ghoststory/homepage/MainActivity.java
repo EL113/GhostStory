@@ -25,7 +25,9 @@ import com.example.ghoststory.db.DbContentList;
 
 import org.litepal.crud.DataSupport;
 
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
@@ -35,7 +37,6 @@ public class MainActivity extends AppCompatActivity {
     private MainFragment mainFragment;
     private StoryTypesFragment storyTypesFragment;
     public static final String ACTION_STORY_TYPES = "com.example.ghost.storyTypes";
-    private double time;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,7 +45,8 @@ public class MainActivity extends AppCompatActivity {
         //设置控件
         initView();
 
-        //如果缓存不为空，则说明之前的碎片对象还在碎片管理中，可以从碎片管理中直接获取碎片对象，或者直接创建碎片对象
+        //检查碎片缓存（碎片缓存都在碎片管理对象中），
+        // 可以从碎片管理对象中直接获取缓存的碎片对象，或者直接创建碎片对象
         if (savedInstanceState != null) {
             mainFragment = (MainFragment) getSupportFragmentManager()
                     .getFragment(savedInstanceState, "MainFragment");
@@ -54,7 +56,7 @@ public class MainActivity extends AppCompatActivity {
             mainFragment = MainFragment.newInstance();
             storyTypesFragment = StoryTypesFragment.newInstance();
         }
-        //把碎片对象和布局联系起来，并添加到碎片管理中
+        //加载碎片到主页布局中
         if (!mainFragment.isAdded()) {
             getSupportFragmentManager().beginTransaction()
                     .add(R.id.layout_fragment, mainFragment, "MainFragment")
@@ -119,8 +121,10 @@ public class MainActivity extends AppCompatActivity {
                         recreate();
                         break;
                     case R.id.sweep_cache:
-                        getNow();
-                        List<DbContentList> list = DataSupport.where("isBookmarked = ? and time < ?","0",String.valueOf(time)).find(DbContentList.class);
+                        String time = new SimpleDateFormat("yyyyMMdd").format(new Date());
+                        time += "000000";
+                        List<DbContentList> list = DataSupport.where("isBookmarked = " +
+                                "? and time < ?","0",time).find(DbContentList.class);
                         for (DbContentList deleteItem : list) {
                             deleteItem.delete();
                         }
@@ -137,7 +141,7 @@ public class MainActivity extends AppCompatActivity {
     private void showMainFragment() {
         FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
         fragmentTransaction.show(mainFragment);
-        ;
+
         fragmentTransaction.hide(storyTypesFragment);
         fragmentTransaction.commit();
 
@@ -156,17 +160,14 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        List<DbContentList> recommendationList = DataSupport.where("typeName=? and isBookmarked=?", "recommendations","0").limit(5).find(DbContentList.class);
+        List<DbContentList> recommendationList = DataSupport.where("typeName=? and isBookmarked=?",
+                "recommendations","0").limit(5).find(DbContentList.class);
         for (DbContentList item : recommendationList) {
             item.delete();
         }
     }
 
-    @Override
-    public void onConfigurationChanged(Configuration newConfig) {
-        super.onConfigurationChanged(newConfig);
-    }
-    //把已经添加好的主碎片和故事列表碎片保存到碎片管理中
+    //把已经添加好的主碎片和故事列表碎片保存到碎片管理作为缓存中
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
@@ -185,23 +186,5 @@ public class MainActivity extends AppCompatActivity {
             mDrawerLayout.openDrawer(GravityCompat.START);
         }
         return false;
-    }
-    //组合出符合条件的当前时间
-    public void getNow() {
-        Calendar c = Calendar.getInstance();
-
-        String year = String.valueOf(c.get(Calendar.YEAR));
-        String month = String.valueOf(c.get(Calendar.MONTH)+1);
-        int monthNumber = c.get(Calendar.MONTH)+1;
-        if (monthNumber >= 0 && monthNumber < 10) {
-            month = "0" + month;
-        }
-        String date = String.valueOf(c.get(Calendar.DATE));
-        int dateNumber=c.get(Calendar.DATE);
-        if (dateNumber >= 0 && dateNumber < 10) {
-            date = "0" + date;
-        }
-
-        time = Double.valueOf(year + month + date + "000000") ;
     }
 }

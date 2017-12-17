@@ -1,6 +1,5 @@
 package com.example.ghoststory.homepage;
 
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -37,7 +36,7 @@ public class BookmarksFragment extends Fragment implements BookmarksContract.Vie
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_bookmarks_list, container, false);
+        View view = inflater.inflate(R.layout.fragment_mian_list, container, false);
         initView(view);
         setHasOptionsMenu(true);
 

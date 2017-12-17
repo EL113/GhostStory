@@ -19,26 +19,14 @@ import com.example.ghoststory.adapter.MainPagerAdapter;
 
 public class MainFragment extends Fragment{
     protected Context context;
-    private MainPagerAdapter adapter;
-
-    private TabLayout tabLayout;
 
     private RecommendationsFragment recommendationsFrag;
     private BookmarksFragment bookmarksFrag;
-
-    private RecommendationsPresenter recommendationsPresenter;
-    private BookmarksPresenter bookmarksPresenter;
-
 
     public MainFragment() {}
 
     public static MainFragment newInstance() {
         return new MainFragment();
-    }
-
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
     }
 
     /**
@@ -56,14 +44,12 @@ public class MainFragment extends Fragment{
             FragmentManager manager = getChildFragmentManager();
             recommendationsFrag = (RecommendationsFragment) manager.getFragment(savedInstanceState, "recommendationsFrag");
             bookmarksFrag = (BookmarksFragment) manager.getFragment(savedInstanceState, "bookmarksFrag");
-
         } else {
             recommendationsFrag = RecommendationsFragment.newInstance();
             bookmarksFrag = BookmarksFragment.newInstance();
         }
-        recommendationsPresenter = new RecommendationsPresenter(context, recommendationsFrag);
-        bookmarksPresenter = new BookmarksPresenter(context, bookmarksFrag);
-
+        new RecommendationsPresenter(context, recommendationsFrag);
+        new BookmarksPresenter(context, bookmarksFrag);
     }
 
 
@@ -81,19 +67,17 @@ public class MainFragment extends Fragment{
 
     private void initViews(View view) {
 
-        tabLayout = (TabLayout) view.findViewById(R.id.tab_layout);
+        TabLayout tabLayout = (TabLayout) view.findViewById(R.id.tab_layout);
         ViewPager viewPager = (ViewPager) view.findViewById(R.id.view_pager);
         viewPager.setOffscreenPageLimit(2);
 
-        adapter = new MainPagerAdapter(
+        MainPagerAdapter adapter = new MainPagerAdapter(
                 getChildFragmentManager(),
-                context,
                 recommendationsFrag,
                 bookmarksFrag);
 
         viewPager.setAdapter(adapter);
         tabLayout.setupWithViewPager(viewPager);
-
     }
 
     @Override

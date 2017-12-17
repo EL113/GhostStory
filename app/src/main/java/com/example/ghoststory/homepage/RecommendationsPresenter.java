@@ -41,7 +41,6 @@ public class RecommendationsPresenter implements RecommendationsContract.Present
     private RecommendationsContract.View view;
     private int page;
     private String[] typeNames = {"dp", "cp" , "xy" , "yy" , "jl" , "mj" , "ly" , "yc" , "neihanguigushi"};
-    ;
     private String typeName;
     private List<DbContentList> list = new ArrayList<>();
     private DbContentList content;
@@ -65,7 +64,6 @@ public class RecommendationsPresenter implements RecommendationsContract.Present
 
     @Override
     public void loadPosts(int page, String type,final boolean clearing) {
-
         if (clearing) {
             view.showLoading();
         }
