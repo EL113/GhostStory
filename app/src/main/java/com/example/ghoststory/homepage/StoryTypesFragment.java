@@ -1,9 +1,5 @@
 package com.example.ghoststory.homepage;
 
-
-
-import android.content.Context;
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -12,20 +8,13 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 
-import com.example.ghoststory.BaseView;
 import com.example.ghoststory.R;
 import com.example.ghoststory.adapter.StoryTypesAdapter;
 import com.example.ghoststory.bean.StoryType;
-import com.example.ghoststory.db.DbContentList;
 import com.example.ghoststory.interfaze.OnRecyclerViewOnClickListener;
 
 import java.util.List;
-
-/**
- * Created by Daniel hunt on 2017/3/25.
- */
 
 public class StoryTypesFragment extends Fragment implements StoryTypesContract.View {
     private StoryTypesContract.Presenter presenter;

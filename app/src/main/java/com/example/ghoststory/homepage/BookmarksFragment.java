@@ -23,12 +23,8 @@ import com.example.ghoststory.search.SearchActivity;
 
 import java.util.List;
 
-/**
- * Created by Daniel hunt on 2017/3/25.
- */
-
-public class BookmarksFragment extends Fragment implements BookmarksContract.View {
-    private BookmarksContract.Presenter presenter;
+public class BookmarksFragment extends Fragment implements StoryListContract.View {
+    private StoryListContract.Presenter presenter;
     private SwipeRefreshLayout refreshLayout;
     private RecyclerView recyclerView;
     private BookmarksAdapter adapter;
@@ -36,7 +32,7 @@ public class BookmarksFragment extends Fragment implements BookmarksContract.Vie
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_mian_list, container, false);
+        View view = inflater.inflate(R.layout.fragment_main_list, container, false);
         initView(view);
         setHasOptionsMenu(true);
 
@@ -45,7 +41,7 @@ public class BookmarksFragment extends Fragment implements BookmarksContract.Vie
         refreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                presenter.checkForFreshData();
+                presenter.start();
             }
         });
         return view;
@@ -68,28 +64,24 @@ public class BookmarksFragment extends Fragment implements BookmarksContract.Vie
         return true;
     }
 
-    public BookmarksFragment() {
-    }
-
-
     public static BookmarksFragment newInstance() {
         return new BookmarksFragment();
     }
 
     @Override
     public void showResults(List<DbContentList> list) {
-            if (adapter == null) {
-                adapter = new BookmarksAdapter(getActivity(), list);
-                adapter.setOnRecyclerViewOnClickListener(new OnRecyclerViewOnClickListener() {
-                    @Override
-                    public void OnItemClicked(View view, int position) {
-                        presenter.startReading(position);
-                    }
-                });
-                recyclerView.setAdapter(adapter);
-            } else {
-                adapter.notifyDataSetChanged();
-            }
+        if (adapter == null) {
+            adapter = new BookmarksAdapter(getActivity(), list);
+            adapter.setOnRecyclerViewOnClickListener(new OnRecyclerViewOnClickListener() {
+                @Override
+                public void OnItemClicked(View view, int position) {
+                    presenter.startReading(position);
+                }
+            });
+            recyclerView.setAdapter(adapter);
+        } else {
+            adapter.notifyDataSetChanged();
+        }
     }
 
     @Override
@@ -108,24 +100,29 @@ public class BookmarksFragment extends Fragment implements BookmarksContract.Vie
         recyclerView = (RecyclerView) view.findViewById(R.id.recyclerView);
 
         refreshLayout.setColorSchemeResources(R.color.colorPrimary);
-
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
     }
 
     @Override
-    public void setPresenter(BookmarksContract.Presenter presenter) {
+    public void setPresenter(StoryListContract.Presenter presenter) {
         if (presenter != null) {
             this.presenter = presenter;
         }
     }
 
     @Override
-    public void dataError() {
-        Snackbar.make(recyclerView, R.string.no_data,Snackbar.LENGTH_SHORT).setAction(R.string.retry, new View.OnClickListener() {
+    public void showError(final String error) {
+        getActivity().runOnUiThread(new Runnable() {
             @Override
-            public void onClick(View v) {
-                presenter.loadResults();
+            public void run() {
+            Snackbar.make(recyclerView, error, Snackbar.LENGTH_INDEFINITE)
+                    .setAction(R.string.retry, new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            presenter.start();
+                        }
+                    }).show();
             }
-        }).show();
+        });
     }
 }

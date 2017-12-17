@@ -10,16 +10,10 @@ import com.example.ghoststory.storylist.StoryList;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Created by Daniel hunt on 2017/3/25.
- */
-
 public class StoryTypesPresenter implements StoryTypesContract.Presenter{
     private Context context;
     private StoryTypesContract.View view;
     private List<StoryType> storyTypesList = new ArrayList<>();
-
-
 
     @Override
     public void start() {
@@ -46,7 +40,7 @@ public class StoryTypesPresenter implements StoryTypesContract.Presenter{
         context.startActivity(intent);
     }
 
-    public StoryTypesPresenter(Context context, StoryTypesContract.View view) {
+    StoryTypesPresenter(Context context, StoryTypesContract.View view) {
         this.context = context;
         this.view = view;
         this.view.setPresenter(this);

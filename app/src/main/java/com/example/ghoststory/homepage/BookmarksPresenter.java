@@ -11,17 +11,13 @@ import org.litepal.crud.DataSupport;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Created by Daniel hunt on 2017/3/27.
- */
-
-public class BookmarksPresenter implements BookmarksContract.Presenter {
+public class BookmarksPresenter implements StoryListContract.Presenter {
     private Context context;
-    private BookmarksContract.View view;
+    private StoryListContract.View view;
     private List<DbContentList> list;
+    private int page;
 
-
-    public BookmarksPresenter(Context context, BookmarksContract.View view) {
+    BookmarksPresenter(Context context, StoryListContract.View view) {
         this.context = context;
         this.view = view;
         this.view.setPresenter(this);
@@ -30,8 +26,33 @@ public class BookmarksPresenter implements BookmarksContract.Presenter {
 
     @Override
     public void start() {
-        loadResults();
+        page = 1;
+        loadResults(true);
     }
+
+    private void loadResults(boolean refresh) {
+        if (refresh) {
+            list.clear();
+        }
+
+        view.showLoading();
+        int storyIndex = (page - 1) * 10;
+        List<DbContentList> queryList = DataSupport.where("isBookmarked = ?", "1")
+                .limit(10)
+                .offset(storyIndex)
+                .find(DbContentList.class);
+        //不能用赋值的方法把一个list的元素加入另一个元素中，只能通过如下遍历的方式，一个一个的加入
+        list.addAll(queryList);
+        view.showResults(list);
+        view.stopLoading();
+}
+
+    @Override
+    public void loadMore() {
+        ++page;
+        loadResults(false);
+    }
+
 
     @Override
     public void startReading(int position) {
@@ -39,26 +60,5 @@ public class BookmarksPresenter implements BookmarksContract.Presenter {
         Intent intent = new Intent(context, DetailActivity.class);
         intent.putExtra("idContent", item.getIdContent());
         context.startActivity(intent);
-    }
-
-    @Override
-    public void loadResults() {
-        view.showLoading();
-
-        list.clear();
-
-        List<DbContentList> queryList = DataSupport.where("isBookmarked=?","1").find(DbContentList.class);
-        //不能用赋值的方法把一个list的元素加入另一个元素中，只能通过如下遍历的方式，一个一个的加入
-        for (DbContentList item : queryList) {
-            list.add(item);
-        }
-
-        view.showResults(list);
-        view.stopLoading();
-    }
-
-    @Override
-    public void checkForFreshData() {
-        loadResults();
     }
 }

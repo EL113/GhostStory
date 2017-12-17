@@ -6,30 +6,20 @@ import com.example.ghoststory.db.DbContentList;
 
 import java.util.List;
 
-/**
- * Created by Daniel hunt on 2017/3/25.
- */
-
-public interface BookmarksContract {
+public interface StoryListContract {
     interface View extends BaseView<Presenter> {
-
-        void showResults(List<DbContentList> list);
+        void showError(String error);
 
         void showLoading();
 
         void stopLoading();
 
-        void dataError();
-
+        void showResults(List<DbContentList> list);
     }
 
     interface Presenter extends BasePresenter {
-
-        void loadResults();
+        void loadMore();
 
         void startReading(int position);
-
-        void checkForFreshData();
-
     }
 }

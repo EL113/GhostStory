@@ -28,17 +28,16 @@ import okhttp3.Callback;
 import okhttp3.Response;
 
 
-public class RecommendationsPresenter implements RecommendationsContract.Presenter{
+public class RecommendationsPresenter implements StoryListContract.Presenter{
     private Context context;
-    private RecommendationsContract.View view;
+    private StoryListContract.View view;
     private int page;
     private String[] typeNames = {"dp", "cp" , "xy" , "yy" , "jl" , "mj" , "ly" , "yc" , "neihanguigushi"};
-    private String typeName;
     private List<DbContentList> list = new ArrayList<>();
     private SimpleDateFormat simpleDateFormat;
 
     //包内可访问
-    RecommendationsPresenter(Context context, RecommendationsContract.View view) {
+    RecommendationsPresenter(Context context, StoryListContract.View view) {
         this.context = context;
         this.view = view;
         this.view.setPresenter(this);
@@ -51,12 +50,12 @@ public class RecommendationsPresenter implements RecommendationsContract.Present
         page = random1.nextInt(100)+1;
         Random random2 = new Random();
         int typeNumber = random2.nextInt(8);
-        typeName = typeNames[typeNumber];
-        loadStory(page, typeName, true);
+        String typeName = typeNames[typeNumber];
+        loadStory(typeName, true);
         view.stopLoading();
     }
 
-    private void loadStory(final int page, final String type,final boolean clearing) {
+    private void loadStory(String type, boolean clearing) {
         if (clearing) {
             view.showLoading();
             list.clear();
@@ -69,7 +68,7 @@ public class RecommendationsPresenter implements RecommendationsContract.Present
             HttpUtil.sendOkHttpRequest(url, new Callback() {
                 @Override
                 public void onFailure(Call call, IOException e) {
-                    view.showError();
+                    view.showError("network request error");
                     view.stopLoading();
                 }
 
@@ -80,7 +79,7 @@ public class RecommendationsPresenter implements RecommendationsContract.Present
 
                     if (requestResult == null) {
                         view.stopLoading();
-                        view.showAnotherError();
+                        view.showError("network request error");
                         return;
                     }
 
@@ -90,7 +89,7 @@ public class RecommendationsPresenter implements RecommendationsContract.Present
                     } catch (EmptyStackException e) {
                         e.printStackTrace();
                         view.stopLoading();
-                        view.showError();
+                        view.showError("network request error");
                     }
 
                     String now = simpleDateFormat.format(new Date());
@@ -118,17 +117,18 @@ public class RecommendationsPresenter implements RecommendationsContract.Present
                 view.showResults(list);
                 view.stopLoading();
             } else {
-                view.showError();
+                view.showError("internet access deny");
             }
         }
     }
 
     @Override
     public void loadMore () {
+        ++page;
         Random random = new Random();
         int typeNumber = random.nextInt(8);
-        typeName = typeNames[typeNumber];
-        loadStory(++page, typeName, false);
+        String typeName = typeNames[typeNumber];
+        loadStory(typeName, false);
     }
 
     @Override

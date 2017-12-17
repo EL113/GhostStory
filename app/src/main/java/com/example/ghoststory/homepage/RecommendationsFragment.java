@@ -17,10 +17,10 @@ import com.example.ghoststory.interfaze.OnRecyclerViewOnClickListener;
 
 import java.util.List;
 
-public class RecommendationsFragment extends Fragment implements RecommendationsContract.View {
+public class RecommendationsFragment extends Fragment implements StoryListContract.View {
     private SwipeRefreshLayout refresh;
     private RecyclerView recyclerView;
-    private RecommendationsContract.Presenter presenter;
+    private StoryListContract.Presenter presenter;
     private RecommendationsAdapter adapter;
 
     public static RecommendationsFragment newInstance() {
@@ -29,7 +29,7 @@ public class RecommendationsFragment extends Fragment implements Recommendations
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_mian_list, container, false);
+        View view = inflater.inflate(R.layout.fragment_main_list, container, false);
         initView(view);
         presenter.start();
         refresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
@@ -80,18 +80,18 @@ public class RecommendationsFragment extends Fragment implements Recommendations
     }
 
     @Override
-    public void setPresenter(RecommendationsContract.Presenter presenter) {
+    public void setPresenter(StoryListContract.Presenter presenter) {
         if (presenter != null) {
             this.presenter = presenter;
         }
     }
 
     @Override
-    public void showError() {
+    public void showError(final String error) {
         getActivity().runOnUiThread(new Runnable() {
             @Override
             public void run() {
-            Snackbar.make(recyclerView, getString(R.string.loaded_fail),Snackbar.LENGTH_INDEFINITE)
+            Snackbar.make(recyclerView, error,Snackbar.LENGTH_INDEFINITE)
                     .setAction(R.string.retry, new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
@@ -139,21 +139,6 @@ public class RecommendationsFragment extends Fragment implements Recommendations
             } else {
                 adapter.notifyDataSetChanged();
             }
-            }
-        });
-    }
-
-    public void showAnotherError() {
-        getActivity().runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-            Snackbar.make(recyclerView, getString(R.string.loaded_fail_again),Snackbar.LENGTH_INDEFINITE)
-                    .setAction(R.string.retry, new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            presenter.start();
-                        }
-                    }).show();
             }
         });
     }

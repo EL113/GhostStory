@@ -6,10 +6,6 @@ import com.example.ghoststory.bean.StoryType;
 
 import java.util.List;
 
-/**
- * Created by Daniel hunt on 2017/3/25.
- */
-
 public interface StoryTypesContract {
 
     interface View extends BaseView<Presenter> {
