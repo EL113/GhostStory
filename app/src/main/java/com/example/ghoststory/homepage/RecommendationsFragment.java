@@ -1,7 +1,6 @@
 package com.example.ghoststory.homepage;
 
 import android.os.Bundle;
-import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -18,10 +17,6 @@ import com.example.ghoststory.interfaze.OnRecyclerViewOnClickListener;
 
 import java.util.List;
 
-/**
- * Created by Daniel hunt on 2017/3/25.
- */
-
 public class RecommendationsFragment extends Fragment implements RecommendationsContract.View {
     private SwipeRefreshLayout refresh;
     private RecyclerView recyclerView;
@@ -30,11 +25,6 @@ public class RecommendationsFragment extends Fragment implements Recommendations
 
     public static RecommendationsFragment newInstance() {
         return new RecommendationsFragment();
-    }
-
-    @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
     }
 
     @Override
@@ -47,7 +37,6 @@ public class RecommendationsFragment extends Fragment implements Recommendations
             public void onRefresh() {
                 presenter.start();
             }
-
         });
 
         recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
@@ -55,7 +44,6 @@ public class RecommendationsFragment extends Fragment implements Recommendations
 
             @Override
             public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
-
                 LinearLayoutManager manager = (LinearLayoutManager) recyclerView.getLayoutManager();
                 // 当不滚动时，如果既不滚动也滚动到最后了就继续加载后一页的数据；
                 if (newState == RecyclerView.SCROLL_STATE_IDLE) {
@@ -68,7 +56,7 @@ public class RecommendationsFragment extends Fragment implements Recommendations
                         presenter.loadMore();
                     }
                 }
-
+                //这段代码是否可以删掉有待实验
                 super.onScrollStateChanged(recyclerView, newState);
             }
 
@@ -103,13 +91,13 @@ public class RecommendationsFragment extends Fragment implements Recommendations
         getActivity().runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                Snackbar.make(recyclerView, getString(R.string.loaded_fail),Snackbar.LENGTH_INDEFINITE)
-                        .setAction(R.string.retry, new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                presenter.start();
-                            }
-                        }).show();
+            Snackbar.make(recyclerView, getString(R.string.loaded_fail),Snackbar.LENGTH_INDEFINITE)
+                    .setAction(R.string.retry, new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            presenter.start();
+                        }
+                    }).show();
             }
         });
     }
@@ -139,19 +127,18 @@ public class RecommendationsFragment extends Fragment implements Recommendations
         getActivity().runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                if (adapter == null) {
-                    adapter = new RecommendationsAdapter(getActivity(), list);
-                    //把类OnRecyclerViewOnClickListener（）这个函数传进去，即数据处理方式的指针，真正的处理方式在setItemClickListener（）函数中实现
-                    adapter.setItemClickListener(new OnRecyclerViewOnClickListener() {
-                        @Override
-                        public void OnItemClicked(View view, int position) {
-                            presenter.startReading(position);
-                        }
-                    });
-                    recyclerView.setAdapter(adapter);
-                } else {
-                    adapter.notifyDataSetChanged();
-                }
+            if (adapter == null) {
+                adapter = new RecommendationsAdapter(getActivity(), list);
+                adapter.setItemClickListener(new OnRecyclerViewOnClickListener() {
+                    @Override
+                    public void OnItemClicked(View view, int position) {
+                        presenter.startReading(position);
+                    }
+                });
+                recyclerView.setAdapter(adapter);
+            } else {
+                adapter.notifyDataSetChanged();
+            }
             }
         });
     }
@@ -160,13 +147,13 @@ public class RecommendationsFragment extends Fragment implements Recommendations
         getActivity().runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                Snackbar.make(recyclerView, getString(R.string.loaded_fail_again),Snackbar.LENGTH_INDEFINITE)
-                        .setAction(R.string.retry, new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                presenter.start();
-                            }
-                        }).show();
+            Snackbar.make(recyclerView, getString(R.string.loaded_fail_again),Snackbar.LENGTH_INDEFINITE)
+                    .setAction(R.string.retry, new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            presenter.start();
+                        }
+                    }).show();
             }
         });
     }

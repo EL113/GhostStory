@@ -1,9 +1,6 @@
 package com.example.ghoststory.homepage;
 
-import android.app.ActivityManager;
-import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
@@ -16,7 +13,6 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatDelegate;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
-import android.view.View;
 
 import com.example.ghoststory.R;
 import com.example.ghoststory.about.AboutPreferenceActivity;
@@ -26,9 +22,9 @@ import com.example.ghoststory.db.DbContentList;
 import org.litepal.crud.DataSupport;
 
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity {
     private Toolbar toolbar;
@@ -67,11 +63,11 @@ public class MainActivity extends AppCompatActivity {
                     .add(R.id.layout_fragment, storyTypesFragment, "StoryTypesFragment")
                     .commit();
         }
-        //给碎片的presenter传递上下文
+
         new StoryTypesPresenter(MainActivity.this, storyTypesFragment);
         //导航菜单的check事件，通过intent事件的动作来判断
         String action = getIntent().getAction();
-        if (action.equals(ACTION_STORY_TYPES)) {
+        if (ACTION_STORY_TYPES.equals(action)) {
             navigationView.setCheckedItem(R.id.nav_types);
             showTypesFragment();
         } else {
@@ -121,7 +117,7 @@ public class MainActivity extends AppCompatActivity {
                         recreate();
                         break;
                     case R.id.sweep_cache:
-                        String time = new SimpleDateFormat("yyyyMMdd").format(new Date());
+                        String time = new SimpleDateFormat("yyyyMMdd", Locale.getDefault()).format(new Date());
                         time += "000000";
                         List<DbContentList> list = DataSupport.where("isBookmarked = " +
                                 "? and time < ?","0",time).find(DbContentList.class);

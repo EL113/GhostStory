@@ -13,10 +13,6 @@ import android.view.ViewGroup;
 import com.example.ghoststory.R;
 import com.example.ghoststory.adapter.MainPagerAdapter;
 
-/**
- * Created by Daniel hunt on 2017/3/25.
- */
-
 public class MainFragment extends Fragment{
     protected Context context;
 
@@ -29,10 +25,7 @@ public class MainFragment extends Fragment{
         return new MainFragment();
     }
 
-    /**
-     * onCreate加载和缓存两个小碎片（推荐和收藏），之前MainActivity加载的是两个大碎片（主碎片和故事类型碎片）,
-     * @param savedInstanceState
-     */
+     //onCreate加载和缓存两个小碎片（推荐和收藏），之前MainActivity加载的是两个大碎片（主碎片和故事类型碎片）,
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
