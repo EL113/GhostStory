@@ -3,12 +3,12 @@ package com.example.ghoststory.search;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.ActionBar;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
@@ -20,9 +20,6 @@ import com.example.ghoststory.interfaze.OnRecyclerViewOnClickListener;
 
 import java.util.List;
 
-/**
- * Created by Daniel hunt on 2017/4/1.
- */
 
 public class SearchFragment extends Fragment implements SearchContract.View{
     private SearchContract.Presenter presenter;
@@ -30,9 +27,6 @@ public class SearchFragment extends Fragment implements SearchContract.View{
     private RecyclerView recyclerView;
     private SearchView searchView;
     private BookmarksAdapter adapter;
-
-    public SearchFragment() {
-    }
 
     @Nullable
     @Override
@@ -53,7 +47,6 @@ public class SearchFragment extends Fragment implements SearchContract.View{
                 return true;
             }
         });
-
         return view;
     }
 
@@ -91,16 +84,20 @@ public class SearchFragment extends Fragment implements SearchContract.View{
     @Override
     public void initView(View view) {
         Toolbar toolbar = (Toolbar) view.findViewById(R.id.search_toolbar);
-        ((SearchActivity)(getActivity())).setSupportActionBar(toolbar);
-        ((SearchActivity)(getActivity())).getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        ((SearchActivity) (getActivity())).getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_arrow_back_white_24dp);
+        SearchActivity activity = (SearchActivity)getActivity();
+        activity.setSupportActionBar(toolbar);
+        ActionBar actionBar = activity.getSupportActionBar();
+        if (actionBar != null) {
+            actionBar.setDisplayHomeAsUpEnabled(true);
+            actionBar.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white_24dp);
+        }
 
         searchView = (SearchView) view.findViewById(R.id.search_view);
         progressBar = (ProgressBar) view.findViewById(R.id.progressbar);
         recyclerView = (RecyclerView) view.findViewById(R.id.recyclerView);
 
         searchView.setIconified(false);
-        recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+        recyclerView.setLayoutManager(new LinearLayoutManager(activity));
     }
 
     @Override

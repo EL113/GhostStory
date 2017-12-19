@@ -15,10 +15,13 @@ public class DetailActivity extends AppCompatActivity {
         setContentView(R.layout.activity_detail_layout);
 
         if (savedInstanceState != null) {
-            detailFragment = (DetailFragment) getSupportFragmentManager().getFragment(savedInstanceState, "DetailFragment");
+            detailFragment = (DetailFragment) getSupportFragmentManager()
+                    .getFragment(savedInstanceState, "DetailFragment");
         } else {
             detailFragment = new DetailFragment();
-            getSupportFragmentManager().beginTransaction().replace(R.id.detail_frame, detailFragment).commit();
+            getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.detail_frame, detailFragment)
+                    .commit();
         }
 
         Intent intent = getIntent();

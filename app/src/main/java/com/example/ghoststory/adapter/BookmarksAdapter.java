@@ -11,14 +11,9 @@ import android.widget.TextView;
 import com.bumptech.glide.Glide;
 import com.example.ghoststory.R;
 import com.example.ghoststory.db.DbContentList;
-import com.example.ghoststory.homepage.BookmarksFragment;
 import com.example.ghoststory.interfaze.OnRecyclerViewOnClickListener;
 
 import java.util.List;
-
-/**
- * Created by Daniel hunt on 2017/3/27.
- */
 
 public class BookmarksAdapter extends RecyclerView.Adapter<BookmarksAdapter.ViewHolder> {
     private Context context;
@@ -31,7 +26,7 @@ public class BookmarksAdapter extends RecyclerView.Adapter<BookmarksAdapter.View
         private TextView desc;
         private OnRecyclerViewOnClickListener listener;
 
-        public ViewHolder(View view, final OnRecyclerViewOnClickListener listener) {
+        ViewHolder(View view, OnRecyclerViewOnClickListener listener) {
             super(view);
             title = (TextView) view.findViewById(R.id.story_title);
             desc = (TextView) view.findViewById(R.id.story_desc);
@@ -58,8 +53,7 @@ public class BookmarksAdapter extends RecyclerView.Adapter<BookmarksAdapter.View
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(context).inflate(R.layout.story_list_item, parent, false);
-        ViewHolder viewHolder = new ViewHolder(view, listener);
-        return viewHolder;
+        return new ViewHolder(view, listener);
     }
 
     @Override

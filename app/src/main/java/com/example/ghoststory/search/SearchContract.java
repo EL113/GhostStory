@@ -6,9 +6,6 @@ import com.example.ghoststory.db.DbContentList;
 
 import java.util.List;
 
-/**
- * Created by Daniel hunt on 2017/4/1.
- */
 
 public interface SearchContract {
     interface Presenter extends BasePresenter {

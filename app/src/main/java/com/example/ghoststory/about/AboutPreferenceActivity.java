@@ -1,6 +1,6 @@
 package com.example.ghoststory.about;
 
-import android.content.Intent;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
@@ -25,10 +25,12 @@ public class AboutPreferenceActivity extends AppCompatActivity {
     }
 
     public void initView() {
-
         setSupportActionBar((Toolbar)findViewById(R.id.about_toolbar));
-        getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_arrow_back_white_24dp);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        ActionBar actionBar = getSupportActionBar();
+        if (actionBar != null) {
+            actionBar.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white_24dp);
+            actionBar.setDisplayHomeAsUpEnabled(true);
+        }
     }
 
     @Override

@@ -104,23 +104,18 @@ public class RecommendationsFragment extends Fragment implements StoryListContra
 
     @Override
     public void showLoading() {
-        refresh.post(new Runnable() {
-            @Override
-            public void run() {
-                refresh.setRefreshing(true);
-            }
-        });
+        refresh.setRefreshing(true);
     }
 
     @Override
     public void stopLoading() {
-                refresh.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        refresh.setRefreshing(false);
-                    }
-                });
+        getActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                refresh.setRefreshing(false);
             }
+        });
+    }
 
     @Override
     public void showResults(final List<DbContentList> list) {

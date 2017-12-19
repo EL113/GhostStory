@@ -6,7 +6,6 @@ import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Build;
 
@@ -15,20 +14,16 @@ import com.example.ghoststory.R;
 import static android.content.Context.CLIPBOARD_SERVICE;
 import static android.content.Context.MODE_PRIVATE;
 
-/**
- * Created by Daniel hunt on 2017/4/1.
- */
 
 public class AboutPresenter implements AboutContract.Presenter {
     private AboutContract.View view;
     private Context context;
-    private SharedPreferences sp;
 
-    public AboutPresenter(Context context, AboutContract.View view) {
+    AboutPresenter(Context context, AboutContract.View view) {
         this.context = context;
         this.view = view;
         this.view.setPresenter(this);
-        sp = context.getSharedPreferences("user_settings",MODE_PRIVATE);
+        context.getSharedPreferences("user_settings",MODE_PRIVATE);
     }
 
     @Override
@@ -39,11 +34,11 @@ public class AboutPresenter implements AboutContract.Presenter {
         dialog.setButton(DialogInterface.BUTTON_POSITIVE, context.getString(R.string.postive), new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
-                // 将指定账号添加到剪切板
-                // add the alipay account to clipboard
                 ClipboardManager manager = (ClipboardManager) context.getSystemService(CLIPBOARD_SERVICE);
                 ClipData clipData = ClipData.newPlainText("text", context.getString(R.string.donate_account));
-                manager.setPrimaryClip(clipData);
+                if (manager != null) {
+                    manager.setPrimaryClip(clipData);
+                }
             }
         });
         dialog.setButton(DialogInterface.BUTTON_NEGATIVE, context.getString(R.string.negative), new DialogInterface.OnClickListener() {

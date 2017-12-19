@@ -5,8 +5,6 @@ import okhttp3.Request;
 
 public class HttpUtil {
     public static void sendOkHttpRequest(final String address, final okhttp3.Callback callback) {
-
-
         new Thread(new Runnable() {
             @Override
             public void run() {

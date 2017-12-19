@@ -10,24 +10,17 @@ import android.support.v4.widget.NestedScrollView;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
-import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.ScrollView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.example.ghoststory.R;
-
-/**
- * Created by Daniel hunt on 2017/3/30.
- */
 
 public class DetailFragment extends Fragment implements DetailContract.View {
     private DetailContract.Presenter presenter;
@@ -84,27 +77,28 @@ public class DetailFragment extends Fragment implements DetailContract.View {
         imageView = (ImageView) view.findViewById(R.id.detail_image);
         refreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.detail_refresh);
         scrollView = (NestedScrollView) view.findViewById(R.id.scroll_view);
+        Toolbar toolbar = (Toolbar) view.findViewById(R.id.detail_toolbar);
 
-        scrollView.setOnTouchListener(new View.OnTouchListener() {
+        scrollView.setOnScrollChangeListener(new NestedScrollView.OnScrollChangeListener() {
             @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                switch (event.getAction()) {
-                    case MotionEvent.ACTION_UP:
-                        if (scrollView.getChildAt(0).getMeasuredHeight() <= scrollView.getScrollY() + scrollView.getHeight()) {
-                            presenter.loadMore();
-                        }
-                        break;
+            public void onScrollChange(NestedScrollView v, int scrollX, int scrollY,
+                                       int oldScrollX, int oldScrollY) {
+                if (v.getChildAt(0).getMeasuredHeight() <=
+                        v.getScrollY() + v.getHeight() && scrollY > oldScrollY) {
+                    presenter.loadMore();
                 }
-                return false;
             }
         });
 
         refreshLayout.setColorSchemeResources(R.color.colorPrimary);
 
         DetailActivity activity = (DetailActivity) getActivity();
-        activity.setSupportActionBar((Toolbar) view.findViewById(R.id.detail_toolbar));
-        activity.getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        activity.getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_arrow_back_white_24dp);
+        ActionBar actionBar = activity.getSupportActionBar();
+        activity.setSupportActionBar(toolbar);
+        if (actionBar != null) {
+            actionBar.setDisplayHomeAsUpEnabled(true);
+            actionBar.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white_24dp);
+        }
     }
 
     @Override
@@ -115,7 +109,6 @@ public class DetailFragment extends Fragment implements DetailContract.View {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-
         switch (item.getItemId()) {
             case android.R.id.home:
                 getActivity().finish();
@@ -123,11 +116,16 @@ public class DetailFragment extends Fragment implements DetailContract.View {
             case R.id.action_more:
                 final BottomSheetDialog dialog = new BottomSheetDialog(getActivity());
 
-                View view = getActivity().getLayoutInflater().inflate(R.layout.menu_more_dialog, null);
+                View view = getActivity().getLayoutInflater().
+                        inflate(R.layout.menu_more_dialog, null);
+
+                ((TextView) view.findViewById(R.id.bookmarks_text))
+                        .setText(R.string.action_delete_from_bookmarks);
 
                 if (presenter.queryIfIsBookmarked()) {
-                    ((TextView) view.findViewById(R.id.bookmarks_text)).setText(R.string.action_delete_from_bookmarks);
-
+                    ((ImageView) view.findViewById(R.id.bookmarks_image))
+                            .setImageResource(R.drawable.ic_star_black_24dp);
+                } else {
                     ((ImageView) view.findViewById(R.id.bookmarks_image))
                             .setImageResource(R.drawable.ic_star_border_black_24dp);
                 }
@@ -238,22 +236,12 @@ public class DetailFragment extends Fragment implements DetailContract.View {
 
     @Override
     public void showLoading() {
-        refreshLayout.post(new Runnable() {
-            @Override
-            public void run() {
-                refreshLayout.setRefreshing(true);
-            }
-        });
+        refreshLayout.setRefreshing(true);
     }
 
     @Override
     public void stopLoading() {
-        refreshLayout.post(new Runnable() {
-            @Override
-            public void run() {
-                refreshLayout.setRefreshing(false);
-            }
-        });
+        refreshLayout.setRefreshing(false);
     }
 
     @Override
@@ -261,7 +249,7 @@ public class DetailFragment extends Fragment implements DetailContract.View {
         Snackbar.make(imageView, R.string.max_page_error,Snackbar.LENGTH_LONG).show();
     }
 
-    public String stringFilter(String text) {
+    private String stringFilter(String text) {
         text = text.replace("&nbsp;","  ").replace("shoye_336();"," ");
         return text;
     }

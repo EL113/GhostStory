@@ -62,10 +62,7 @@ public class RecommendationsPresenter implements StoryListContract.Presenter{
         }
 
         if (NetworkState.networkConnected(context)) {
-            String now = simpleDateFormat.format(new Date());
-            String url = API.STORY_LIST + "page=" + page + API.API_ID + now + "&type=" + type + API.API_SIGN;
-
-            HttpUtil.sendOkHttpRequest(url, new Callback() {
+            HttpUtil.sendOkHttpRequest(API.getStoryListUrl(page, type), new Callback() {
                 @Override
                 public void onFailure(Call call, IOException e) {
                     view.showError("network request error");
@@ -94,17 +91,18 @@ public class RecommendationsPresenter implements StoryListContract.Presenter{
 
                     String now = simpleDateFormat.format(new Date());
                     for (ContentList item:responseList) {
-                        //每次循环都要新建一次DbContentList对象，被填充过的对象不能被再次被填充
                         DbContentList content = new DbContentList();
-                        content.setTitle(item.getTitle());
-                        content.setIdContent(item.getId());
-                        content.setImg(item.getImg());
-                        content.setDesc(item.getDesc());
-                        content.setLink(item.getLink());
-                        content.setIsBookmarked("0");
-                        content.setTypeName("recommendations");
-                        content.setTime(Double.valueOf(now));
-                        content.save();
+                        if (Utility.queryIfIDExists(item.getId())) {
+                            content.setTitle(item.getTitle());
+                            content.setIdContent(item.getId());
+                            content.setImg(item.getImg());
+                            content.setDesc(item.getDesc());
+                            content.setLink(item.getLink());
+                            content.setIsBookmarked("0");
+                            content.setTypeName("recommendations");
+                            content.setTime(Double.valueOf(now));
+                            content.save();
+                        }
                         list.add(content);
                     }
                     view.showResults(list);
@@ -116,9 +114,8 @@ public class RecommendationsPresenter implements StoryListContract.Presenter{
                 list = DataSupport.where("typeName = ?","recommendations").find(DbContentList.class);
                 view.showResults(list);
                 view.stopLoading();
-            } else {
-                view.showError("internet access deny");
             }
+            view.showError("internet access deny");
         }
     }
 
@@ -129,6 +126,7 @@ public class RecommendationsPresenter implements StoryListContract.Presenter{
         int typeNumber = random.nextInt(8);
         String typeName = typeNames[typeNumber];
         loadStory(typeName, false);
+        view.stopLoading();
     }
 
     @Override

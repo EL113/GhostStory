@@ -3,18 +3,12 @@ package com.example.ghoststory.about;
 import android.os.Bundle;
 
 import android.support.design.widget.Snackbar;
-import android.support.v7.preference.Preference;
 import android.support.v7.preference.PreferenceFragmentCompat;
 import android.support.v7.widget.Toolbar;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 
 import com.example.ghoststory.R;
 
-/**
- * Created by Daniel hunt on 2017/4/1.
- */
 
 public class AboutFragment extends PreferenceFragmentCompat implements AboutContract.View {
     private AboutContract.Presenter presenter;

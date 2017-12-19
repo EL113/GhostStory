@@ -1,6 +1,5 @@
 package com.example.ghoststory.adapter;
 
-import android.content.Context;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
@@ -8,23 +7,11 @@ import android.support.v4.app.FragmentPagerAdapter;
 import com.example.ghoststory.homepage.BookmarksFragment;
 import com.example.ghoststory.homepage.RecommendationsFragment;
 
-/**
- * Created by Daniel hunt on 2017/3/25.
- */
-
 public class MainPagerAdapter extends FragmentPagerAdapter {
     private String[] titles;
 
     private RecommendationsFragment recommendationsFrag;
     private BookmarksFragment bookmarksFrag;
-
-    public RecommendationsFragment getRecommendationsFrag () {
-        return recommendationsFrag;
-    }
-
-    public BookmarksFragment getBookmarksFrag () {
-        return bookmarksFrag;
-    }
 
     public MainPagerAdapter(FragmentManager fm,
                             RecommendationsFragment recommendationsFrag,

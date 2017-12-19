@@ -3,11 +3,7 @@ package com.example.ghoststory.detail;
 import com.example.ghoststory.BasePresenter;
 import com.example.ghoststory.BaseView;
 
-/**
- * Created by Daniel hunt on 2017/3/30.
- */
-
-public class DetailContract {
+public interface DetailContract {
     interface Presenter extends BasePresenter {
         void setIdContent(String id);
 
@@ -47,9 +43,9 @@ public class DetailContract {
 
         void showShareError();
 
-        void showLoading();
-
         void showLinkCopied();
+
+        void showLoading();
 
         void stopLoading();
 

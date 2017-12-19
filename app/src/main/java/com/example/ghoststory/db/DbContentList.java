@@ -2,10 +2,6 @@ package com.example.ghoststory.db;
 
 import org.litepal.crud.DataSupport;
 
-/**
- * Created by Daniel hunt on 2017/3/25.
- */
-
 public class DbContentList extends DataSupport {
 
     private int id;

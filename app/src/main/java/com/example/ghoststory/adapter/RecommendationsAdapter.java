@@ -11,15 +11,10 @@ import android.widget.TextView;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.example.ghoststory.R;
-import com.example.ghoststory.bean.ContentList;
 import com.example.ghoststory.db.DbContentList;
 import com.example.ghoststory.interfaze.OnRecyclerViewOnClickListener;
 
 import java.util.List;
-
-/**
- * Created by Daniel hunt on 2017/3/25.
- */
 
 public class RecommendationsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
@@ -28,7 +23,7 @@ public class RecommendationsAdapter extends RecyclerView.Adapter<RecyclerView.Vi
     private OnRecyclerViewOnClickListener listener;
 
     private static final int TYPE_NORMAL = 0;
-    private static final int TYPE_LOADMORE = 1;
+    private static final int TYPE_LOAD_MORE = 1;
 
     static class NormalViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         private ImageView imageView;
@@ -37,7 +32,7 @@ public class RecommendationsAdapter extends RecyclerView.Adapter<RecyclerView.Vi
         private OnRecyclerViewOnClickListener listener;
 
 
-        public NormalViewHolder(View view, OnRecyclerViewOnClickListener listener) {
+        NormalViewHolder(View view, OnRecyclerViewOnClickListener listener) {
             super(view);
             imageView = (ImageView) view.findViewById(R.id.story_image);
             title = (TextView) view.findViewById(R.id.story_title);
@@ -57,7 +52,7 @@ public class RecommendationsAdapter extends RecyclerView.Adapter<RecyclerView.Vi
 
     public class RequestMoreViewHolder extends RecyclerView.ViewHolder{
 
-        public RequestMoreViewHolder(View itemView) {
+        RequestMoreViewHolder(View itemView) {
             super(itemView);
         }
 
@@ -73,41 +68,28 @@ public class RecommendationsAdapter extends RecyclerView.Adapter<RecyclerView.Vi
         switch (viewType) {
             case TYPE_NORMAL:
                 View view = LayoutInflater.from(context).inflate(R.layout.story_list_item, parent, false);
-                NormalViewHolder normalViewHolder = new NormalViewHolder(view, listener);
-                return normalViewHolder;
-            case TYPE_LOADMORE:
+                return new NormalViewHolder(view, listener);
+            case TYPE_LOAD_MORE:
                 View view1 = LayoutInflater.from(context).inflate(R.layout.request_more_layout,parent,false);
-                RequestMoreViewHolder loadingViewHolder = new RequestMoreViewHolder(view1);
-                return loadingViewHolder;
+                return new RequestMoreViewHolder(view1);
+            default:
+                return null;
         }
-        return null;
     }
 
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
-
         if (holder instanceof NormalViewHolder) {
             DbContentList contentItem = list.get(position);
             NormalViewHolder normalViewHolder = (NormalViewHolder)holder;
-            if (contentItem.getImg() == null || contentItem.getTitle().equals(null) || contentItem.getDesc().equals(null)) {
-                Glide.with(context).load(contentItem.getImg()).asBitmap().centerCrop()
-                        .diskCacheStrategy(DiskCacheStrategy.SOURCE)
-                        .placeholder(R.drawable.ic_error_black_24dp)
-                        .error(R.drawable.ic_error_black_24dp)
-                        .into(normalViewHolder.imageView);
-                normalViewHolder.title.setText("数据错误");
-                normalViewHolder.desc.setText("数据错误");
-            } else {
-                Glide.with(context).load(contentItem.getImg()).asBitmap().centerCrop()
-                        .diskCacheStrategy(DiskCacheStrategy.SOURCE)
-                        .placeholder(R.drawable.ic_error_black_24dp)
-                        .error(R.drawable.ic_error_black_24dp)
-                        .into(normalViewHolder.imageView);
-                normalViewHolder.title.setText(contentItem.getTitle());
-                normalViewHolder.desc.setText(contentItem.getDesc());
-            }
+            Glide.with(context).load(contentItem.getImg()).asBitmap().centerCrop()
+                    .diskCacheStrategy(DiskCacheStrategy.SOURCE)
+                    .placeholder(R.drawable.ic_error_black_24dp)
+                    .error(R.drawable.ic_error_black_24dp)
+                    .into(normalViewHolder.imageView);
+            normalViewHolder.title.setText(contentItem.getTitle());
+            normalViewHolder.desc.setText(contentItem.getDesc());
         }
-
     }
 
     @Override
@@ -118,7 +100,7 @@ public class RecommendationsAdapter extends RecyclerView.Adapter<RecyclerView.Vi
     @Override
     public int getItemViewType(int position) {
         if (position == list.size()) {
-            return TYPE_LOADMORE;
+            return TYPE_LOAD_MORE;
         } else {
             return TYPE_NORMAL;
         }

@@ -15,10 +15,6 @@ import com.example.ghoststory.interfaze.OnRecyclerViewOnClickListener;
 
 import java.util.List;
 
-/**
- * Created by Daniel hunt on 2017/3/27.
- */
-
 public class StoryTypesAdapter extends RecyclerView.Adapter<StoryTypesAdapter.ViewHolder> {
 
     private List<StoryType> list;
@@ -30,7 +26,7 @@ public class StoryTypesAdapter extends RecyclerView.Adapter<StoryTypesAdapter.Vi
         private ImageView typeImageView;
         private OnRecyclerViewOnClickListener listener;
 
-        public ViewHolder(View view, OnRecyclerViewOnClickListener listener) {
+        ViewHolder(View view, OnRecyclerViewOnClickListener listener) {
             super(view);
             typeName = (TextView) view.findViewById(R.id.type_title);
             typeImageView = (ImageView) view.findViewById(R.id.type_image);
@@ -68,7 +64,6 @@ public class StoryTypesAdapter extends RecyclerView.Adapter<StoryTypesAdapter.Vi
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(context).inflate(R.layout.story_type_item,parent, false);
-        ViewHolder viewHolder = new ViewHolder(view,listener);
-        return viewHolder;
+        return new ViewHolder(view,listener);
     }
 }
