@@ -41,8 +41,10 @@ public class MainActivity extends AppCompatActivity {
         //设置控件
         initView();
 
-        //检查碎片缓存（碎片缓存都在碎片管理对象中），
-        // 可以从碎片管理对象中直接获取缓存的碎片对象，或者直接创建碎片对象
+        setupFragments(savedInstanceState);
+    }
+
+    private void setupFragments(Bundle savedInstanceState) {
         if (savedInstanceState != null) {
             mainFragment = (MainFragment) getSupportFragmentManager()
                     .getFragment(savedInstanceState, "MainFragment");
@@ -75,20 +77,21 @@ public class MainActivity extends AppCompatActivity {
             showMainFragment();
         }
     }
+
     //设置控件
     private void initView() {
         //设置标题栏
-        toolbar = (Toolbar) findViewById(R.id.toolbar);
+        toolbar = findViewById(R.id.toolbar);
+        mDrawerLayout = findViewById(R.id.drawer_layout);
+
         setSupportActionBar(toolbar);
-        //添加标题栏的返回按钮
-        mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
             actionBar.setDisplayHomeAsUpEnabled(true);
             actionBar.setHomeAsUpIndicator(R.drawable.ic_menu_white_24dp);
         }
         //导航菜单的各种点击事件
-        navigationView = (NavigationView) findViewById(R.id.nav_view);
+        navigationView = findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull final MenuItem item) {
@@ -104,26 +107,11 @@ public class MainActivity extends AppCompatActivity {
                         startActivity(new Intent(MainActivity.this, AboutPreferenceActivity.class));
                         break;
                     case R.id.nav_theme://夜间模式的切换
-                        //检测当前主题是否是夜间模式
-                        int mode = getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK;
-                        //如果当前模式是夜间模式，则关闭夜间模式
-                        if(mode == Configuration.UI_MODE_NIGHT_YES) {
-                            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
-                        } else if(mode == Configuration.UI_MODE_NIGHT_NO) {
-                            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
-                        }
-                        //设置窗口改变的动画效果
-                        getWindow().setWindowAnimations(R.style.WindowAnimationFadeInOut);
-                        recreate();
+                        setupNightMode();
                         break;
                     case R.id.sweep_cache:
                         String time = new SimpleDateFormat("yyyyMMdd", Locale.getDefault()).format(new Date());
-                        time += "000000";
-                        List<DbContentList> list = DataSupport.where("isBookmarked = " +
-                                "? and time < ?","0",time).find(DbContentList.class);
-                        for (DbContentList deleteItem : list) {
-                            deleteItem.delete();
-                        }
+                        DataSupport.deleteAll("DbContentList", "isBookmarked = ? and time < ?","0",time);
                         break;
                     default:
                         break;
@@ -131,6 +119,20 @@ public class MainActivity extends AppCompatActivity {
                 return true;
             }
         });
+    }
+
+    private void setupNightMode() {
+        //检测当前主题是否是夜间模式
+        int mode = getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK;
+        //如果当前模式是夜间模式，则关闭夜间模式
+        if(mode == Configuration.UI_MODE_NIGHT_YES) {
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
+        } else if(mode == Configuration.UI_MODE_NIGHT_NO) {
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
+        }
+        //设置窗口改变的动画效果
+        getWindow().setWindowAnimations(R.style.WindowAnimationFadeInOut);
+        recreate();
     }
 
     //显示主碎片，并设置标题内容

@@ -35,9 +35,7 @@ public class BookmarksFragment extends Fragment implements StoryListContract.Vie
         View view = inflater.inflate(R.layout.fragment_main_list, container, false);
         initView(view);
         setHasOptionsMenu(true);
-
         presenter.start();
-
         refreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
@@ -52,8 +50,6 @@ public class BookmarksFragment extends Fragment implements StoryListContract.Vie
         inflater.inflate(R.menu.menu_bookmarks, menu);
         super.onCreateOptionsMenu(menu, inflater);
     }
-
-
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -96,8 +92,8 @@ public class BookmarksFragment extends Fragment implements StoryListContract.Vie
 
     @Override
     public void initView(View view) {
-        refreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.refreshLayout);
-        recyclerView = (RecyclerView) view.findViewById(R.id.recyclerView);
+        refreshLayout = view.findViewById(R.id.refreshLayout);
+        recyclerView = view.findViewById(R.id.recyclerView);
 
         refreshLayout.setColorSchemeResources(R.color.colorPrimary);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));

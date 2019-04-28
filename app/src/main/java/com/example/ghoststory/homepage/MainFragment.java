@@ -14,12 +14,8 @@ import com.example.ghoststory.R;
 import com.example.ghoststory.adapter.MainPagerAdapter;
 
 public class MainFragment extends Fragment{
-    protected Context context;
-
     private RecommendationsFragment recommendationsFrag;
     private BookmarksFragment bookmarksFrag;
-
-    public MainFragment() {}
 
     public static MainFragment newInstance() {
         return new MainFragment();
@@ -30,9 +26,12 @@ public class MainFragment extends Fragment{
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        this.context = getActivity();
+        setupChildFragments(savedInstanceState);
+    }
 
-        //fragmentManager碎片管理中取出缓存的碎片，或者重新创建；；
+    private void setupChildFragments(Bundle savedInstanceState) {
+        Context context = getActivity();
+        //fragmentManager碎片管理中取出缓存的碎片，否则创建；
         if (savedInstanceState != null) {
             FragmentManager manager = getChildFragmentManager();
             recommendationsFrag = (RecommendationsFragment) manager.getFragment(savedInstanceState, "recommendationsFrag");
@@ -49,19 +48,15 @@ public class MainFragment extends Fragment{
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_main, container, false);
-
         initViews(view);
-
         setHasOptionsMenu(true);
-
         return view;
     }
 
 
     private void initViews(View view) {
-
-        TabLayout tabLayout = (TabLayout) view.findViewById(R.id.tab_layout);
-        ViewPager viewPager = (ViewPager) view.findViewById(R.id.view_pager);
+        TabLayout tabLayout = view.findViewById(R.id.tab_layout);
+        ViewPager viewPager = view.findViewById(R.id.view_pager);
         viewPager.setOffscreenPageLimit(2);
 
         MainPagerAdapter adapter = new MainPagerAdapter(

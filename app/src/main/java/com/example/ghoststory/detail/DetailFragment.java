@@ -10,6 +10,7 @@ import android.support.v4.widget.NestedScrollView;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -18,6 +19,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.example.ghoststory.R;
@@ -25,36 +27,17 @@ import com.example.ghoststory.R;
 public class DetailFragment extends Fragment implements DetailContract.View {
     private DetailContract.Presenter presenter;
     private TextView detailText;
-    private ImageView imageView;
-    private CollapsingToolbarLayout toolbarLayout;
     private SwipeRefreshLayout refreshLayout;
     private NestedScrollView scrollView;
+    private Toolbar toolbar;
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.frag_detail, container, false);
-
         initView(view);
-
         setHasOptionsMenu(true);
-
         presenter.start();
-
-        view.findViewById(R.id.detail_toolbar).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                scrollView.smoothScrollTo(0,0);
-            }
-        });
-
-        refreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
-            @Override
-            public void onRefresh() {
-                presenter.start();
-            }
-        });
-
         return view;
     }
 
@@ -63,21 +46,18 @@ public class DetailFragment extends Fragment implements DetailContract.View {
         getActivity().runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                toolbarLayout.setTitle(title);
+                toolbar.setTitle(title);
                 detailText.setText(stringFilter(text));
-                Glide.with(getActivity()).load(image).asBitmap().centerCrop().into(imageView);
             }
         });
     }
 
     @Override
     public void initView(View view) {
-        toolbarLayout = (CollapsingToolbarLayout) view.findViewById(R.id.detail_collapsing_toolbar);
-        detailText = (TextView) view.findViewById(R.id.detail_text);
-        imageView = (ImageView) view.findViewById(R.id.detail_image);
-        refreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.detail_refresh);
-        scrollView = (NestedScrollView) view.findViewById(R.id.scroll_view);
-        Toolbar toolbar = (Toolbar) view.findViewById(R.id.detail_toolbar);
+        detailText = view.findViewById(R.id.detail_text);
+        refreshLayout = view.findViewById(R.id.detail_refresh);
+        scrollView = view.findViewById(R.id.scroll_view);
+        toolbar = view.findViewById(R.id.detail_toolbar);
 
         scrollView.setOnScrollChangeListener(new NestedScrollView.OnScrollChangeListener() {
             @Override
@@ -91,11 +71,25 @@ public class DetailFragment extends Fragment implements DetailContract.View {
         });
 
         refreshLayout.setColorSchemeResources(R.color.colorPrimary);
+        toolbar.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                scrollView.smoothScrollTo(0,0);
+            }
+        });
+
+        refreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                presenter.start();
+            }
+        });
 
         DetailActivity activity = (DetailActivity) getActivity();
-        ActionBar actionBar = activity.getSupportActionBar();
         activity.setSupportActionBar(toolbar);
+        ActionBar actionBar = activity.getSupportActionBar();
         if (actionBar != null) {
+            actionBar.setHomeButtonEnabled(true);
             actionBar.setDisplayHomeAsUpEnabled(true);
             actionBar.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white_24dp);
         }
@@ -114,72 +108,54 @@ public class DetailFragment extends Fragment implements DetailContract.View {
                 getActivity().finish();
                 break;
             case R.id.action_more:
-                final BottomSheetDialog dialog = new BottomSheetDialog(getActivity());
-
-                View view = getActivity().getLayoutInflater().
-                        inflate(R.layout.menu_more_dialog, null);
-
-                ((TextView) view.findViewById(R.id.bookmarks_text))
-                        .setText(R.string.action_delete_from_bookmarks);
-
-                if (presenter.queryIfIsBookmarked()) {
-                    ((ImageView) view.findViewById(R.id.bookmarks_image))
-                            .setImageResource(R.drawable.ic_star_black_24dp);
-                } else {
-                    ((ImageView) view.findViewById(R.id.bookmarks_image))
-                            .setImageResource(R.drawable.ic_star_border_black_24dp);
-                }
-
-                view.findViewById(R.id.layout_bookmark).setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        dialog.dismiss();
-                        presenter.addToOrDeleteFromBookmarks();
-                    }
-                });
-
-                view.findViewById(R.id.layout_copy_link).setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        dialog.dismiss();
-                        presenter.copyLink();
-                    }
-                });
-
-                view.findViewById(R.id.layout_open_in_browser).setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        dialog.dismiss();
-                        presenter.openInBrowser();
-                    }
-                });
-
-                view.findViewById(R.id.layout_copy_text).setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        dialog.dismiss();
-                        presenter.copyText();
-                    }
-                });
-
-                // shareAsText the content as text
-                view.findViewById(R.id.layout_share_text).setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        dialog.dismiss();
-                        presenter.shareAsText();
-                    }
-                });
-                dialog.setContentView(view);
-                dialog.show();
-            break;
+                setupBottomSheetDialog();
+                break;
         }
         return true;
     }
 
+    private void setupBottomSheetDialog() {
+        final BottomSheetDialog dialog = new BottomSheetDialog(getActivity());
+
+        View view = getActivity().getLayoutInflater().
+                inflate(R.layout.menu_more_dialog, null);
+
+        //收藏与取消收藏
+        boolean isBookmarked = presenter.queryIfIsBookmarked();
+        if (isBookmarked) {
+            ((ImageView) view.findViewById(R.id.bookmarks_image))
+                    .setImageResource(R.drawable.ic_star_black_24dp);
+            ((TextView) view.findViewById(R.id.bookmarks_text))
+                    .setText(R.string.action_delete_from_bookmarks);
+        } else {
+            ((ImageView) view.findViewById(R.id.bookmarks_image))
+                    .setImageResource(R.drawable.ic_star_border_black_24dp);
+            ((TextView) view.findViewById(R.id.bookmarks_text))
+                    .setText(R.string.action_add_to_bookmarks);
+        }
+
+        view.findViewById(R.id.layout_bookmark).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialog.dismiss();
+                presenter.addToOrDeleteFromBookmarks();
+            }
+        });
+
+        view.findViewById(R.id.layout_copy_text).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialog.dismiss();
+                presenter.copyText();
+            }
+        });
+        dialog.setContentView(view);
+        dialog.show();
+    }
+
     @Override
     public void showError() {
-        Snackbar.make(imageView, R.string.internet_error, Snackbar.LENGTH_INDEFINITE).setAction(R.string.retry, new View.OnClickListener() {
+        Snackbar.make(toolbar, R.string.internet_error, Snackbar.LENGTH_INDEFINITE).setAction(R.string.retry, new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 presenter.start();
@@ -189,42 +165,27 @@ public class DetailFragment extends Fragment implements DetailContract.View {
 
     @Override
     public void showAddedToBookmarks() {
-        Snackbar.make(imageView, R.string.added_to_bookmarks, Snackbar.LENGTH_SHORT).show();
-    }
-
-    @Override
-    public void showBrowserNotFoundError() {
-        Snackbar.make(imageView, R.string.no_browser_found,Snackbar.LENGTH_SHORT).show();
+        Snackbar.make(toolbar, R.string.added_to_bookmarks, Snackbar.LENGTH_SHORT).show();
     }
 
     @Override
     public void showCopyTextError() {
-        Snackbar.make(imageView, R.string.copied_to_clipboard_failed, Snackbar.LENGTH_SHORT).show();
+        Snackbar.make(toolbar, R.string.copied_to_clipboard_failed, Snackbar.LENGTH_SHORT).show();
     }
 
     @Override
     public void showDeletedFromBookmarks() {
-        Snackbar.make(imageView, R.string.deleted_from_bookmarks, Snackbar.LENGTH_SHORT).show();
+        Snackbar.make(toolbar, R.string.deleted_from_bookmarks, Snackbar.LENGTH_SHORT).show();
     }
 
     @Override
     public void showLinkError() {
-        Snackbar.make(imageView, R.string.link_error, Snackbar.LENGTH_SHORT).show();
-    }
-
-    @Override
-    public void showShareError() {
-        Snackbar.make(imageView,R.string.share_error,Snackbar.LENGTH_SHORT).show();
+        Snackbar.make(toolbar, R.string.link_error, Snackbar.LENGTH_SHORT).show();
     }
 
     @Override
     public void showTextCopied() {
-        Snackbar.make(imageView, R.string.copied_to_clipboard, Snackbar.LENGTH_SHORT).show();
-    }
-
-    @Override
-    public void showLinkCopied() {
-        Snackbar.make(imageView, R.string.link_copied,Snackbar.LENGTH_SHORT).show();
+        Snackbar.make(toolbar, R.string.copied_to_clipboard, Snackbar.LENGTH_SHORT).show();
     }
 
     @Override
@@ -246,7 +207,7 @@ public class DetailFragment extends Fragment implements DetailContract.View {
 
     @Override
     public void showMaxPage() {
-        Snackbar.make(imageView, R.string.max_page_error,Snackbar.LENGTH_LONG).show();
+        Toast.makeText(getActivity(), R.string.max_page_error, Toast.LENGTH_SHORT).show();
     }
 
     private String stringFilter(String text) {

@@ -21,16 +21,14 @@ public class BookmarksAdapter extends RecyclerView.Adapter<BookmarksAdapter.View
     private OnRecyclerViewOnClickListener listener;
 
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
-        private ImageView imageView;
         private TextView title;
         private TextView desc;
         private OnRecyclerViewOnClickListener listener;
 
         ViewHolder(View view, OnRecyclerViewOnClickListener listener) {
             super(view);
-            title = (TextView) view.findViewById(R.id.story_title);
-            desc = (TextView) view.findViewById(R.id.story_desc);
-            imageView = (ImageView) view.findViewById(R.id.story_image);
+            title = view.findViewById(R.id.story_title);
+            desc = view.findViewById(R.id.story_desc);
             this.listener = listener;
             view.setOnClickListener(this);
         }
@@ -61,7 +59,6 @@ public class BookmarksAdapter extends RecyclerView.Adapter<BookmarksAdapter.View
         DbContentList item = list.get(position);
         holder.title.setText(item.getTitle());
         holder.desc.setText(item.getDesc());
-        Glide.with(context).load(item.getImg()).asBitmap().centerCrop().into(holder.imageView);
     }
 
     @Override

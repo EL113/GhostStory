@@ -41,7 +41,6 @@ public class BookmarksPresenter implements StoryListContract.Presenter {
                 .limit(10)
                 .offset(storyIndex)
                 .find(DbContentList.class);
-        //不能用赋值的方法把一个list的元素加入另一个元素中，只能通过如下遍历的方式，一个一个的加入
         list.addAll(queryList);
         view.showResults(list);
         view.stopLoading();

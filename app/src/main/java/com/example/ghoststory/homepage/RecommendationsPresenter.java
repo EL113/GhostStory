@@ -2,6 +2,7 @@ package com.example.ghoststory.homepage;
 
 import android.content.Context;
 import android.content.Intent;
+import android.util.Log;
 
 import com.example.ghoststory.bean.ContentList;
 import com.example.ghoststory.bean.RequestResult;
@@ -27,7 +28,6 @@ import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.Response;
 
-
 public class RecommendationsPresenter implements StoryListContract.Presenter{
     private Context context;
     private StoryListContract.View view;
@@ -46,11 +46,9 @@ public class RecommendationsPresenter implements StoryListContract.Presenter{
 
     @Override
     public void start() {
-        Random random1 = new Random();
-        page = random1.nextInt(100)+1;
-        Random random2 = new Random();
-        int typeNumber = random2.nextInt(8);
-        String typeName = typeNames[typeNumber];
+        Random random = new Random();
+        page = random.nextInt(100);
+        String typeName = typeNames[page % 8];
         loadStory(typeName, true);
         view.stopLoading();
     }
@@ -61,62 +59,74 @@ public class RecommendationsPresenter implements StoryListContract.Presenter{
             list.clear();
         }
 
-        if (NetworkState.networkConnected(context)) {
-            HttpUtil.sendOkHttpRequest(API.getStoryListUrl(page, type), new Callback() {
-                @Override
-                public void onFailure(Call call, IOException e) {
+        boolean isNetworkAvailable = NetworkState.networkConnected(context);
+        //没有网络并且是第一页就加载内存中的数据
+        if (!isNetworkAvailable && list.size() == 0) {
+            list = DataSupport.where("typeName = ?","recommendations").find(DbContentList.class);
+            view.showResults(list);
+            view.stopLoading();
+            view.showError("网络异常");
+            return;
+        } else if (!isNetworkAvailable){
+            view.showError("网络异常");
+            return;
+        }
+
+        HttpUtil.sendOkHttpRequest(API.getStoryListUrl(page, type), new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                view.showError("网络请求失败");
+                view.stopLoading();
+            }
+
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                String responseText = response.body().string();
+                RequestResult requestResult = Utility.handleStoryListData(responseText);
+
+                if (requestResult == null) {
+                    view.stopLoading();
+                    view.showError("数据解析异常");
+                    return;
+                }
+
+                if (requestResult.getResponseCode() != 0){
+                    view.showError(requestResult.getResponseError());
+                    view.stopLoading();
+                    return;
+                }
+
+                List<ContentList> responseList = new ArrayList<>();
+                try {
+                    responseList = requestResult.getResponseBody().getPagebean().getContentlist();
+                } catch (EmptyStackException e) {
+                    e.printStackTrace();
+                    view.stopLoading();
                     view.showError("network request error");
-                    view.stopLoading();
                 }
 
-                @Override
-                public void onResponse(Call call, Response response) throws IOException {
-                    String responseText = response.body().string();
-                    RequestResult requestResult = Utility.handleStoryListData(responseText);
+                String now = simpleDateFormat.format(new Date());
+                for (ContentList item:responseList) {
+                    DbContentList content = new DbContentList();
+                    content.setTitle(item.getTitle());
+                    content.setIdContent(item.getLink());
+                    content.setImg(item.getImg());
+                    content.setDesc(item.getDesc());
+                    content.setLink(item.getLink());
+                    content.setIsBookmarked("0");
+                    content.setTypeName("recommendations");
+                    content.setTime(Double.valueOf(now));
 
-                    if (requestResult == null) {
-                        view.stopLoading();
-                        view.showError("network request error");
-                        return;
+                    if (!Utility.queryIfIDExists(item.getLink())) {
+                        content.save();
                     }
 
-                    List<ContentList> responseList = new ArrayList<>();
-                    try {
-                        responseList = requestResult.getResponseBody().getPagebean().getContentlist();
-                    } catch (EmptyStackException e) {
-                        e.printStackTrace();
-                        view.stopLoading();
-                        view.showError("network request error");
-                    }
-
-                    String now = simpleDateFormat.format(new Date());
-                    for (ContentList item:responseList) {
-                        DbContentList content = new DbContentList();
-                        if (Utility.queryIfIDExists(item.getId())) {
-                            content.setTitle(item.getTitle());
-                            content.setIdContent(item.getId());
-                            content.setImg(item.getImg());
-                            content.setDesc(item.getDesc());
-                            content.setLink(item.getLink());
-                            content.setIsBookmarked("0");
-                            content.setTypeName("recommendations");
-                            content.setTime(Double.valueOf(now));
-                            content.save();
-                        }
-                        list.add(content);
-                    }
-                    view.showResults(list);
-                    view.stopLoading();
+                    list.add(content);
                 }
-            });
-        } else {
-            if (clearing) {
-                list = DataSupport.where("typeName = ?","recommendations").find(DbContentList.class);
                 view.showResults(list);
                 view.stopLoading();
             }
-            view.showError("internet access deny");
-        }
+        });
     }
 
     @Override
@@ -130,12 +140,10 @@ public class RecommendationsPresenter implements StoryListContract.Presenter{
     }
 
     @Override
-    public void startReading ( int position){
+    public void startReading (int position){
         Intent intent = new Intent(context, DetailActivity.class);
         intent.putExtra("idContent", list.get(position).getIdContent())
-                .putExtra("title", list.get(position).getTitle())
-                .putExtra("image", list.get(position).getImg())
-                .putExtra("link", list.get(position).getLink());
+                .putExtra("title", list.get(position).getTitle());
         context.startActivity(intent);
     }
 }

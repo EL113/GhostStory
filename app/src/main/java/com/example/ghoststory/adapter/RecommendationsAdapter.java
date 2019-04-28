@@ -26,7 +26,6 @@ public class RecommendationsAdapter extends RecyclerView.Adapter<RecyclerView.Vi
     private static final int TYPE_LOAD_MORE = 1;
 
     static class NormalViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
-        private ImageView imageView;
         private TextView title;
         private TextView desc;
         private OnRecyclerViewOnClickListener listener;
@@ -34,9 +33,8 @@ public class RecommendationsAdapter extends RecyclerView.Adapter<RecyclerView.Vi
 
         NormalViewHolder(View view, OnRecyclerViewOnClickListener listener) {
             super(view);
-            imageView = (ImageView) view.findViewById(R.id.story_image);
-            title = (TextView) view.findViewById(R.id.story_title);
-            desc = (TextView) view.findViewById(R.id.story_desc);
+            title = view.findViewById(R.id.story_title);
+            desc = view.findViewById(R.id.story_desc);
             this.listener = listener;
             view.setOnClickListener(this);
         }
@@ -51,11 +49,9 @@ public class RecommendationsAdapter extends RecyclerView.Adapter<RecyclerView.Vi
     }
 
     public class RequestMoreViewHolder extends RecyclerView.ViewHolder{
-
         RequestMoreViewHolder(View itemView) {
             super(itemView);
         }
-
     }
 
     public RecommendationsAdapter(Context context, List<DbContentList> contentList) {
@@ -82,11 +78,6 @@ public class RecommendationsAdapter extends RecyclerView.Adapter<RecyclerView.Vi
         if (holder instanceof NormalViewHolder) {
             DbContentList contentItem = list.get(position);
             NormalViewHolder normalViewHolder = (NormalViewHolder)holder;
-            Glide.with(context).load(contentItem.getImg()).asBitmap().centerCrop()
-                    .diskCacheStrategy(DiskCacheStrategy.SOURCE)
-                    .placeholder(R.drawable.ic_error_black_24dp)
-                    .error(R.drawable.ic_error_black_24dp)
-                    .into(normalViewHolder.imageView);
             normalViewHolder.title.setText(contentItem.getTitle());
             normalViewHolder.desc.setText(contentItem.getDesc());
         }

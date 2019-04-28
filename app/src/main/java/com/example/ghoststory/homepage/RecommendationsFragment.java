@@ -6,6 +6,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -32,6 +33,17 @@ public class RecommendationsFragment extends Fragment implements StoryListContra
         View view = inflater.inflate(R.layout.fragment_main_list, container, false);
         initView(view);
         presenter.start();
+        return view;
+    }
+
+    @Override
+    public void initView(View view) {
+        recyclerView = view.findViewById(R.id.recyclerView);
+        recyclerView.setHasFixedSize(true);
+        recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+
+        refresh = view.findViewById(R.id.refreshLayout);
+        refresh.setColorSchemeResources(R.color.colorPrimary);
         refresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
@@ -56,7 +68,6 @@ public class RecommendationsFragment extends Fragment implements StoryListContra
                         presenter.loadMore();
                     }
                 }
-                //这段代码是否可以删掉有待实验
                 super.onScrollStateChanged(recyclerView, newState);
             }
 
@@ -66,17 +77,6 @@ public class RecommendationsFragment extends Fragment implements StoryListContra
                 isSlidingToLast = dy > 0;
             }
         });
-        return view;
-    }
-
-    @Override
-    public void initView(View view) {
-        recyclerView = (RecyclerView) view.findViewById(R.id.recyclerView);
-        recyclerView.setHasFixedSize(true);
-        recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
-
-        refresh = (SwipeRefreshLayout) view.findViewById(R.id.refreshLayout);
-        refresh.setColorSchemeResources(R.color.colorPrimary);
     }
 
     @Override
@@ -121,19 +121,19 @@ public class RecommendationsFragment extends Fragment implements StoryListContra
     public void showResults(final List<DbContentList> list) {
         getActivity().runOnUiThread(new Runnable() {
             @Override
-            public void run() {
-            if (adapter == null) {
-                adapter = new RecommendationsAdapter(getActivity(), list);
-                adapter.setItemClickListener(new OnRecyclerViewOnClickListener() {
-                    @Override
-                    public void OnItemClicked(View view, int position) {
-                        presenter.startReading(position);
-                    }
-                });
-                recyclerView.setAdapter(adapter);
-            } else {
-                adapter.notifyDataSetChanged();
-            }
+                public void run() {
+                if (adapter == null) {
+                    adapter = new RecommendationsAdapter(getActivity(), list);
+                    adapter.setItemClickListener(new OnRecyclerViewOnClickListener() {
+                        @Override
+                        public void OnItemClicked(View view, int position) {
+                            presenter.startReading(position);
+                        }
+                    });
+                    recyclerView.setAdapter(adapter);
+                } else {
+                    adapter.notifyDataSetChanged();
+                }
             }
         });
     }

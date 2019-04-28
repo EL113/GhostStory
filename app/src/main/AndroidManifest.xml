@@ -28,7 +28,7 @@
             android:name=".detail.DetailActivity" />
         <activity
             android:name=".storylist.StoryList" />
-        <activity android:name=".search.SearchActivity"></activity>
+        <activity android:name=".search.SearchActivity"/>
     </application>
 
 </manifest>

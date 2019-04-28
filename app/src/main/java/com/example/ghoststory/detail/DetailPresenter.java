@@ -5,6 +5,7 @@ import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
+import android.util.Log;
 
 import com.example.ghoststory.R;
 import com.example.ghoststory.bean.DetailResult;
@@ -13,16 +14,12 @@ import com.example.ghoststory.util.API;
 import com.example.ghoststory.util.HttpUtil;
 import com.example.ghoststory.util.NetworkState;
 import com.example.ghoststory.util.Utility;
-
 import org.litepal.crud.DataSupport;
-
 import java.io.IOException;
 import java.util.List;
-
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.Response;
-
 import static android.content.Context.CLIPBOARD_SERVICE;
 
 public class DetailPresenter implements DetailContract.Presenter{
@@ -45,7 +42,8 @@ public class DetailPresenter implements DetailContract.Presenter{
     public void start() {
         List<DbContentList> queryList = DataSupport.where("idContent=?", idContent).find(DbContentList.class);
         item = queryList.get(0);
-        if (queryIfTextExist()) {
+        boolean isContentCached = item.getText() != null;
+        if (isContentCached) {
             textDetail = item.getText();
             currentPage = item.getCurrentPage();
             allPages = Integer.valueOf(item.getMaxPage());
@@ -59,50 +57,52 @@ public class DetailPresenter implements DetailContract.Presenter{
 
     @Override
     public void loadPost(String page) {
-        if (NetworkState.networkConnected(context)) {
-            HttpUtil.sendOkHttpRequest(API.getStoryContentUrl(page, idContent), new Callback() {
-                @Override
-                public void onFailure(Call call, IOException e) {
-                    textDetail = "Error";
-                    view.showError();
-                    //这里需要一个错误标题和错误图片，出现错误的文字
-                    view.setData(item.getTitle(),item.getImg(),textDetail);
-                }
-
-                @Override
-                public void onResponse(Call call, Response response) throws IOException {
-                    try {
-                        String responseText = response.body().string();
-                        DetailResult detailResult = Utility.handleStoryDetailData(responseText);
-                        if (detailResult == null) {
-                            view.showError();
-                            return;
-                        }
-                        allPages = detailResult.getDetailBody().getAllPages();
-                        currentPage = detailResult.getDetailBody().getCurrentPage();
-                        String queryText = detailResult.getDetailBody().getText();
-                        StringBuilder textBuilder = new StringBuilder(textDetail);
-                        textDetail = textBuilder.append(queryText).toString();
-
-                        DbContentList updateItem = new DbContentList();
-                        updateItem.setCurrentPage(currentPage);
-                        updateItem.setMaxPage(String.valueOf(allPages));
-                        updateItem.setText(textDetail);
-                        updateItem.updateAll("idContent=?", idContent);
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                        textDetail = "Parse Error";
-                        view.showError();
-                        view.setData(item.getTitle(), item.getImg(), textDetail);
-                    }
-                    view.setData(item.getTitle(), item.getImg(), textDetail);
-                }
-            });
-        }else {
-            textDetail = "please connect network";
+        boolean isNetworkAvailable = NetworkState.networkConnected(context);
+        if (!isNetworkAvailable){
+            textDetail = "网络异常";
             view.showLinkError();
             view.setData(item.getTitle(),item.getImg(),textDetail);
+            return;
         }
+
+        HttpUtil.sendOkHttpRequest(API.getStoryContentUrl(page, idContent), new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                textDetail = "Error";
+                view.showError();
+                //这里需要一个错误标题和错误图片，出现错误的文字
+                view.setData(item.getTitle(),item.getImg(),textDetail);
+            }
+
+            @Override
+            public void onResponse(Call call, Response response) {
+                try {
+                    String responseText = response.body().string();
+                    DetailResult detailResult = Utility.handleStoryDetailData(responseText);
+                    if (detailResult == null) {
+                        view.showError();
+                        return;
+                    }
+                    allPages = detailResult.getDetailBody().getAllPages();
+                    currentPage = detailResult.getDetailBody().getCurrentPage();
+                    String queryText = detailResult.getDetailBody().getText();
+                    StringBuilder textBuilder = new StringBuilder(textDetail);
+                    textDetail = textBuilder.append(queryText).toString();
+
+                    DbContentList updateItem = new DbContentList();
+                    updateItem.setCurrentPage(currentPage);
+                    updateItem.setMaxPage(String.valueOf(allPages));
+                    updateItem.setText(textDetail);
+                    updateItem.updateAll("idContent=?", idContent);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    textDetail = "Parse Error";
+                    view.showError();
+                    view.setData(item.getTitle(), item.getImg(), textDetail);
+                }
+                view.setData(item.getTitle(), item.getImg(), textDetail);
+            }
+        });
     }
 
     @Override
@@ -137,23 +137,7 @@ public class DetailPresenter implements DetailContract.Presenter{
     }
 
     @Override
-    public void copyLink() {
-        if (item.getLink().equals("")) {
-            view.showCopyTextError();
-        } else {
-            ClipboardManager manager = (ClipboardManager) context.getSystemService(CLIPBOARD_SERVICE);
-            ClipData clipData;
-            clipData = ClipData.newPlainText("copied link",item.getLink());
-            if (manager != null) {
-                manager.setPrimaryClip(clipData);
-            }
-            view.showLinkCopied();
-        }
-    }
-
-    @Override
     public void copyText() {
-
         if (item.getText().equals("")) {
             view.showCopyTextError();
         } else {
@@ -168,47 +152,7 @@ public class DetailPresenter implements DetailContract.Presenter{
     }
 
     @Override
-    public void openInBrowser() {
-        if (item.getLink().equals("")) {
-            view.showLinkError();
-            return;
-        }
-
-        try {
-            Intent intent = new Intent(Intent.ACTION_VIEW);
-            intent.setData(Uri.parse(item.getLink()));
-            context.startActivity(intent);
-        }catch (android.content.ActivityNotFoundException ex){
-            view.showBrowserNotFoundError();
-        }
-
-    }
-
-    @Override
-    public void shareAsText() {
-        if (item.getLink().equals("")) {
-            view.showShareError();
-            return;
-        }
-
-        try {
-            Intent shareIntent = new Intent().setAction(Intent.ACTION_SEND).setType("text/plain");
-            String shareText =  "" + item.getTitle() + " "+ item.getLink()+ "\t\t\t" + context.getString(R.string.share_extra);
-
-            shareIntent.putExtra(Intent.EXTRA_TEXT,shareText);
-            context.startActivity(Intent.createChooser(shareIntent,context.getString(R.string.share_to)));
-        } catch (android.content.ActivityNotFoundException ex){
-            view.showShareError();
-        }
-
-    }
-
-    @Override
     public boolean queryIfIsBookmarked() {
         return item.getIsBookmarked().equals("1");
-    }
-
-    private boolean queryIfTextExist() {
-        return !item.getText().equals("");
     }
 }

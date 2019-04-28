@@ -33,7 +33,7 @@ public class DetailActivity extends AppCompatActivity {
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         if (detailFragment.isAdded()) {
-            getSupportFragmentManager().getFragment(outState, "DetailFragment");
+            getSupportFragmentManager().putFragment(outState, "DetailFragment", detailFragment);
         }
     }
 }

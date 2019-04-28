@@ -9,13 +9,7 @@ public interface DetailContract {
 
         void addToOrDeleteFromBookmarks();
 
-        void copyLink();
-
-        void openInBrowser();
-
         void copyText();
-
-        void shareAsText();
 
         boolean queryIfIsBookmarked();
 
@@ -29,8 +23,6 @@ public interface DetailContract {
 
         void setData(String title,String image,String text);
 
-        void showBrowserNotFoundError();
-
         void showCopyTextError();
 
         void showTextCopied();
@@ -40,10 +32,6 @@ public interface DetailContract {
         void showDeletedFromBookmarks();
 
         void showLinkError();
-
-        void showShareError();
-
-        void showLinkCopied();
 
         void showLoading();
 

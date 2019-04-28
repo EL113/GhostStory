@@ -37,7 +37,7 @@ public class StoryTypesFragment extends Fragment implements StoryTypesContract.V
 
     @Override
     public void initView(View view) {
-        recyclerView = (RecyclerView) view.findViewById(R.id.story_type_layout);
+        recyclerView = view.findViewById(R.id.story_type_layout);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
     }
 

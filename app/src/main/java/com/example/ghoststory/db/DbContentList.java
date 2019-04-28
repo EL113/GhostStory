@@ -113,4 +113,22 @@ public class DbContentList extends DataSupport {
     public String getTypeName() {
         return typeName;
     }
+
+    @Override
+    public String toString() {
+        return "DbContentList{" +
+                "id=" + id +
+                ", idContent='" + idContent + '\'' +
+                ", title='" + title + '\'' +
+                ", desc='" + desc + '\'' +
+                ", link='" + link + '\'' +
+                ", img='" + img + '\'' +
+                ", text='" + text + '\'' +
+                ", isBookmarked='" + isBookmarked + '\'' +
+                ", typeName='" + typeName + '\'' +
+                ", maxPage='" + maxPage + '\'' +
+                ", currentPage='" + currentPage + '\'' +
+                ", time=" + time +
+                '}';
+    }
 }
