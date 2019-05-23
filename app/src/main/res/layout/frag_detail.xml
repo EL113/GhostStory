@@ -13,26 +13,95 @@
         android:background="@color/colorPrimary"
         app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
         android:id="@+id/detail_toolbar"/>
-    <android.support.v4.widget.SwipeRefreshLayout
+    <RelativeLayout
+        android:orientation="horizontal"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:id="@+id/detail_refresh">
-
-        <android.support.v4.widget.NestedScrollView
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:id="@+id/scroll_view"
-            android:scrollbars="vertical"
-            android:scrollbarFadeDuration="1"
-            android:fadeScrollbars="true"
-            app:layout_behavior="@string/appbar_scrolling_view_behavior">
+        android:layout_height="wrap_content">
+        <ImageView
+            android:id="@+id/thumb_up_img"
+            android:layout_alignParentLeft="true"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_margin="8dp"
+            android:src="@drawable/baseline_thumb_up_black_24"/>
+        <TextView
+            android:text="0"
+            android:textSize="18sp"
+            android:layout_marginRight="18dp"
+            android:layout_toRightOf="@id/thumb_up_img"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="18dp"
+            android:id="@+id/thumb_up_count"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+        <ImageView
+            android:src="@drawable/baseline_thumb_down_black_24"
+            android:layout_gravity="center_vertical"
+            android:layout_marginTop="8dp"
+            android:layout_marginRight="8dp"
+            android:layout_toRightOf="@id/thumb_up_count"
+            android:id="@+id/thumb_down_img"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+        <TextView
+            android:id="@+id/thumb_down_count"
+            android:textSize="18sp"
+            android:text="0"
+            android:layout_marginTop="8dp"
+            android:layout_marginRight="18dp"
+            android:layout_toRightOf="@id/thumb_down_img"
+            android:layout_gravity="center_vertical"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+        <ImageView
+            android:src="@drawable/baseline_turned_in_not_black_24"
+            android:layout_gravity="center_vertical"
+            android:layout_marginTop="8dp"
+            android:layout_marginRight="8dp"
+            android:layout_toRightOf="@id/thumb_down_count"
+            android:id="@+id/collect_img"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+        <TextView
+            android:id="@+id/collect_count"
+            android:textSize="18sp"
+            android:text="0"
+            android:layout_marginTop="8dp"
+            android:layout_marginRight="18dp"
+            android:layout_toRightOf="@id/collect_img"
+            android:layout_gravity="center_vertical"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+        <TextView
+            android:id="@+id/author_text"
+            android:layout_margin="8dp"
+            android:layout_alignParentRight="true"
+            android:layout_gravity="center_vertical"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="作者："/>
+    </RelativeLayout>
+    <android.support.v4.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:id="@+id/scroll_view"
+        android:scrollbars="vertical"
+        android:scrollbarFadeDuration="1"
+        android:fadeScrollbars="true"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
                 <TextView
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_marginBottom="8dp"
                     android:id="@+id/detail_text"
                     android:textSize="16sp"
                     android:lineSpacingMultiplier="1.5"
                     android:layout_margin="10dp"/>
-        </android.support.v4.widget.NestedScrollView>
-    </android.support.v4.widget.SwipeRefreshLayout>
+            </LinearLayout>
+    </android.support.v4.widget.NestedScrollView>
 </LinearLayout>

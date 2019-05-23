@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8" ?>
     <litepal>
-    <dbname value="DbContentList"></dbname>
-    <version value="6" ></version>
+    <dbname value="DbContentList"/>
+    <version value="10" />
     <list>
-        <mapping class="com.example.ghoststory.db.DbContentList" />
+        <mapping class="com.yesong.ghoststory.db.DbContentList" />
     </list>
 </litepal>
