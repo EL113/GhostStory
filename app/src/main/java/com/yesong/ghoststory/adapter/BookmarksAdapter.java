@@ -21,12 +21,16 @@ public class BookmarksAdapter extends RecyclerView.Adapter<BookmarksAdapter.View
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         private TextView title;
         private TextView desc;
+        private TextView author;
+        private TextView auditStatus;
         private OnRecyclerViewOnClickListener listener;
 
         ViewHolder(View view, OnRecyclerViewOnClickListener listener) {
             super(view);
             title = view.findViewById(R.id.story_title);
             desc = view.findViewById(R.id.story_desc);
+            author = view.findViewById(R.id.story_author);
+            auditStatus = view.findViewById(R.id.story_audit);
             this.listener = listener;
             view.setOnClickListener(this);
         }
@@ -57,6 +61,18 @@ public class BookmarksAdapter extends RecyclerView.Adapter<BookmarksAdapter.View
         DbContentList item = list.get(position);
         holder.title.setText(item.getTitle());
         holder.desc.setText(item.getDesc());
+        holder.author.setText(item.getAuthor());
+        holder.auditStatus.setVisibility(View.VISIBLE);
+        if ("0".equals(item.getAuditStatus())){
+            holder.auditStatus.setText("审核中");
+        } else if ("1".equals(item.getAuditStatus())){
+            holder.auditStatus.setText("通过");
+        } else if ("2".equals(item.getAuditStatus())) {
+            holder.auditStatus.setText("未通过");
+        } else {
+            holder.auditStatus.setVisibility(View.GONE);
+        }
+
     }
 
     @Override

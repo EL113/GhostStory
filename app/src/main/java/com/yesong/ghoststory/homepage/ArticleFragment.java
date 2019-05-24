@@ -59,19 +59,24 @@ public class ArticleFragment extends Fragment implements StoryListContract.View 
     }
 
     @Override
-    public void showResults(List<DbContentList> list) {
-        if (adapter == null) {
-            adapter = new BookmarksAdapter(getActivity(), list);
-            adapter.setOnRecyclerViewOnClickListener(new OnRecyclerViewOnClickListener() {
-                @Override
-                public void OnItemClicked(View view, int position) {
-                    presenter.startReading(position);
+    public void showResults(final List<DbContentList> list) {
+        getActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                if (adapter == null) {
+                    adapter = new BookmarksAdapter(getActivity(), list);
+                    adapter.setOnRecyclerViewOnClickListener(new OnRecyclerViewOnClickListener() {
+                        @Override
+                        public void OnItemClicked(View view, int position) {
+                            presenter.startReading(position);
+                        }
+                    });
+                    recyclerView.setAdapter(adapter);
+                } else {
+                    adapter.notifyDataSetChanged();
                 }
-            });
-            recyclerView.setAdapter(adapter);
-        } else {
-            adapter.notifyDataSetChanged();
-        }
+            }
+        });
     }
 
     @Override

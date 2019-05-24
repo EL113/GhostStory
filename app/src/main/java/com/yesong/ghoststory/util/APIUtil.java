@@ -10,6 +10,7 @@ public class APIUtil {
     private static final String typeStory = "/type/list";
     private static final String publishStory = "/publish";
     private static final String deleteStory = "/delete";
+    private static final String auditResult = "/audit/result";
 
     public static String getRecommendListUrl(){
         return host + recommendList;
@@ -41,5 +42,9 @@ public class APIUtil {
 
     public static String deleteStory(){
         return host + deleteStory;
+    }
+
+    public static String auditResult(){
+        return host + auditResult;
     }
 }

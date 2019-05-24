@@ -22,6 +22,15 @@ public class DbContentList extends DataSupport {
     private String typeMessage;
     private String author;
     private String authorId = "-1";
+    private String auditStatus = "-1";    // -1 默认  0 审核中 1 通过 2 未通过
+
+    public String getAuditStatus() {
+        return auditStatus;
+    }
+
+    public void setAuditStatus(String auditStatus) {
+        this.auditStatus = auditStatus;
+    }
 
     public String getAuthorId() {
         return authorId;
