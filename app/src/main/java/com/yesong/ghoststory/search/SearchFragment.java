@@ -2,6 +2,7 @@ package com.yesong.ghoststory.search;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.LinearLayoutManager;
@@ -19,7 +20,6 @@ import com.yesong.ghoststory.db.DbContentList;
 import com.yesong.ghoststory.interfaze.OnRecyclerViewOnClickListener;
 
 import java.util.List;
-
 
 public class SearchFragment extends Fragment implements SearchContract.View{
     private SearchContract.Presenter presenter;
@@ -51,20 +51,24 @@ public class SearchFragment extends Fragment implements SearchContract.View{
     }
 
     @Override
-    public void showResults(List<DbContentList> list) {
-        if (adapter == null) {
-            adapter = new BookmarksAdapter(getActivity(), list);
-            adapter.setOnRecyclerViewOnClickListener(new OnRecyclerViewOnClickListener() {
-                @Override
-                public void OnItemClicked(View view, int position) {
-                    presenter.startReading(position);
+    public void showResults(final List<DbContentList> list) {
+        getActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                if (adapter == null) {
+                    adapter = new BookmarksAdapter(getActivity(), list);
+                    adapter.setOnRecyclerViewOnClickListener(new OnRecyclerViewOnClickListener() {
+                        @Override
+                        public void OnItemClicked(View view, int position) {
+                            presenter.startReading(position);
+                        }
+                    });
+                    recyclerView.setAdapter(adapter);
+                } else {
+                    adapter.notifyDataSetChanged();
                 }
-            });
-            recyclerView.setAdapter(adapter);
-        } else {
-            adapter.notifyDataSetChanged();
-        }
-
+            }
+        });
     }
 
     public static SearchFragment newInstance() {
@@ -73,12 +77,22 @@ public class SearchFragment extends Fragment implements SearchContract.View{
 
     @Override
     public void showLoading() {
-        progressBar.setVisibility(View.VISIBLE);
+        getActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                progressBar.setVisibility(View.VISIBLE);
+            }
+        });
     }
 
     @Override
     public void stopLoading() {
-        progressBar.setVisibility(View.GONE);
+        getActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                progressBar.setVisibility(View.GONE);
+            }
+        });
     }
 
     @Override
@@ -105,5 +119,15 @@ public class SearchFragment extends Fragment implements SearchContract.View{
         if (presenter != null) {
             this.presenter = presenter;
         }
+    }
+
+    @Override
+    public void showError(final String msg) {
+        getActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                Snackbar.make(recyclerView, msg, Snackbar.LENGTH_SHORT).show();
+            }
+        });
     }
 }

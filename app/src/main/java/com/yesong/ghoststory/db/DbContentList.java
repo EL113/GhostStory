@@ -4,10 +4,10 @@ import org.litepal.crud.DataSupport;
 
 public class DbContentList extends DataSupport {
     private int id;
-    private String idContent;
+    private String idContent;   //故事的唯一标识
     private String title;
     private String desc;
-    private String text;
+    private String text;    //内容
     private int collectionCount = 0;
     private int isBookmarked = 0;
     private int thumbUp = 0;
@@ -225,27 +225,5 @@ public class DbContentList extends DataSupport {
             isBookmarked = 0;
             collectionCount--;
         }
-    }
-
-    @Override
-    public String toString() {
-        return "DbContentList{" +
-                "id=" + id +
-                ", idContent='" + idContent + '\'' +
-                ", title='" + title + '\'' +
-                ", collectionCount=" + collectionCount +
-                ", isBookmarked=" + isBookmarked +
-                ", thumbUp=" + thumbUp +
-                ", isThumbUp=" + isThumbUp +
-                ", thumbDown=" + thumbDown +
-                ", isThumbDown=" + isThumbDown +
-                ", typeName='" + typeName + '\'' +
-                ", maxPage=" + maxPage +
-                ", currentPage=" + currentPage +
-                ", createTime='" + createTime + '\'' +
-                ", itemType=" + itemType +
-                ", typeMessage='" + typeMessage + '\'' +
-                ", author='" + author + '\'' +
-                '}';
     }
 }

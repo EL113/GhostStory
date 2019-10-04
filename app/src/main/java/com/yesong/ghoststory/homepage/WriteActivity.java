@@ -11,8 +11,10 @@ import android.view.MenuItem;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.google.gson.JsonObject;
 import com.yesong.ghoststory.R;
 import com.yesong.ghoststory.bean.CommonResult;
+import com.yesong.ghoststory.bean.ContentList;
 import com.yesong.ghoststory.db.DbContentList;
 import com.yesong.ghoststory.detail.DetailActivity;
 import com.yesong.ghoststory.util.APIUtil;
@@ -27,6 +29,7 @@ import java.util.List;
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.FormBody;
+import okhttp3.MediaType;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 
@@ -34,6 +37,7 @@ public class WriteActivity extends AppCompatActivity {
     private EditText title;
     private EditText author;
     private EditText content;
+    private DbContentList contentItem;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -81,7 +85,6 @@ public class WriteActivity extends AppCompatActivity {
 
     private void publishStory() {
         String authorId = getAuthorId();
-        String storyId = String.valueOf(System.currentTimeMillis() % 100000000);
         String storyTitle = title.getText().toString();
         String storyAuthor = author.getText().toString();
         String storyContent = content.getText().toString();
@@ -92,14 +95,14 @@ public class WriteActivity extends AppCompatActivity {
             return;
         }
 
-        RequestBody requestBody = new FormBody.Builder()
-                .add("id", storyId)
-                .add("title", storyTitle)
-                .add("type", "yc")
-                .add("author", storyAuthor)
-                .add("authorId", authorId)
-                .add("content", storyContent)
-                .build();
+        final JsonObject jsonObject = new JsonObject();
+        jsonObject.addProperty("title", storyTitle);
+        jsonObject.addProperty("author", storyAuthor);
+        jsonObject.addProperty("content", storyContent);
+        jsonObject.addProperty("authorId", authorId);
+        jsonObject.addProperty("type", "yc");
+        jsonObject.addProperty("content", storyContent);
+        RequestBody requestBody = RequestBody.create(MediaType.parse("application/json"), jsonObject.toString());
 
         HttpUtil.post(APIUtil.publishStory(), requestBody, new Callback() {
             @Override
@@ -113,21 +116,25 @@ public class WriteActivity extends AppCompatActivity {
                 CommonResult result = Utility.resolveResponse(responseText, CommonResult.class);
                 if (result.getCode() != 0) {
                     Toast.makeText(WriteActivity.this, "保存失败", Toast.LENGTH_SHORT).show();
-                } else {
-                    finish();
+                    return;
                 }
+
+                String contentString = jsonObject.get("content").getAsString();
+                if (contentItem == null){
+                    contentItem = new DbContentList();
+                }
+                contentItem.setIdContent(result.getResult());
+                contentItem.setTitle(jsonObject.get("title").getAsString());
+                contentItem.setAuthor(jsonObject.get("author").getAsString());
+                contentItem.setDesc(contentString.length() > 50 ? contentString.substring(0, 50) : contentString);
+                contentItem.setTypeName("yc");
+                contentItem.setText(jsonObject.get("content").getAsString());
+                contentItem.setAuthorId(jsonObject.get("authorId").getAsString());
+                contentItem.setAuditStatus("0");
+                contentItem.save();
+                finish();
             }
         });
-
-        DbContentList content = new DbContentList();
-        content.setIdContent(storyId);
-        content.setTitle(storyTitle);
-        content.setAuthor(storyAuthor);
-        content.setDesc(storyContent.substring(0, 50));
-        content.setTypeName("yc");
-        content.setText(storyContent);
-        content.setAuthorId(authorId);
-        content.save();
     }
 
     private String emptyCheck(String storyTitle, String storyAuthor, String storyContent) {
@@ -162,9 +169,9 @@ public class WriteActivity extends AppCompatActivity {
     }
 
     private void fillData(String id, String type) {
-        DbContentList item = DataSupport.where("idContent = ? and typeName = ?", id, type).find(DbContentList.class).get(0);
-        title.setText(item.getTitle());
-        author.setText(item.getAuthor());
-        content.setText(item.getText());
+        contentItem = DataSupport.where("idContent = ? and typeName = ?", id, type).find(DbContentList.class).get(0);
+        title.setText(contentItem.getTitle());
+        author.setText(contentItem.getAuthor());
+        content.setText(contentItem.getText());
     }
 }

@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 
 import com.yesong.ghoststory.bean.AuditResponse;
+import com.yesong.ghoststory.bean.ContentList;
 import com.yesong.ghoststory.db.DbContentList;
 import com.yesong.ghoststory.detail.DetailActivity;
 import com.yesong.ghoststory.util.APIUtil;
@@ -19,15 +20,12 @@ import java.util.List;
 
 import okhttp3.Call;
 import okhttp3.Callback;
-import okhttp3.FormBody;
-import okhttp3.RequestBody;
 import okhttp3.Response;
 
 public class ArticlePresenter implements StoryListContract.Presenter {
     private Context context;
     private StoryListContract.View view;
     private List<DbContentList> list;
-    private int page;
     private String authorId;
 
     ArticlePresenter(Context context, StoryListContract.View view) {
@@ -41,7 +39,6 @@ public class ArticlePresenter implements StoryListContract.Presenter {
 
     @Override
     public void start() {
-        page = 1;
         loadResults(true);
     }
 
@@ -51,10 +48,7 @@ public class ArticlePresenter implements StoryListContract.Presenter {
         }
 
         view.showLoading();
-        List<DbContentList> queryList = new ArrayList<>();
-        if (authorId != null) {
-            queryList = getDbList();
-        }
+        List<DbContentList> queryList = getDbList();
 
         updateAuditStatus(queryList);
 
@@ -63,15 +57,15 @@ public class ArticlePresenter implements StoryListContract.Presenter {
 
     private void updateAuditStatus(final List<DbContentList> contentList){
         StringBuilder ids = new StringBuilder();
+        int index = 0;
         for (DbContentList contentItem: contentList){
-            ids.append(contentItem.getIdContent()).append(",");
+            ids.append(contentItem.getIdContent());
+            if (index != contentList.size() - 1) {
+                ids.append(",");
+            }
         }
-        String idStr = ids.toString();
-        String requestIds = idStr.substring(0, idStr.length() - 1);
-        RequestBody requestBody = new FormBody.Builder()
-                .add("ids", requestIds).build();
 
-        HttpUtil.post(APIUtil.auditResult(), requestBody, new Callback() {
+        HttpUtil.get(APIUtil.auditResult(ids.toString()), new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
                 view.showError("请求错误");
@@ -86,30 +80,34 @@ public class ArticlePresenter implements StoryListContract.Presenter {
                     return;
                 }
 
-                List<String> auditResult = auditResponse.getResultList();
-                for (int i = 0; i < auditResult.size(); i++) {
-                    DbContentList contentItem = contentList.get(i);
-                    contentItem.setAuditStatus(auditResult.get(i));
-                    contentItem.save();
+                //修改状态
+                List<ContentList> auditResult = auditResponse.getResult();
+                for (int i = 0; i < contentList.size(); i++) {
+                    DbContentList dbContentItem = contentList.get(i);
+                    for (ContentList contentItem: auditResult) {
+                        if (dbContentItem.getIdContent().equals(contentItem.getId())){
+                            dbContentItem.setAuditStatus(contentItem.getStatus());
+                            dbContentItem.save();
+                            list.add(dbContentItem);
+                        }
+                    }
                 }
-
-                list.addAll(contentList);
                 view.showResults(list);
             }
         });
     }
 
+    //数据库中文章作者id号的文章属于文集中的内容
     private List<DbContentList> getDbList() {
-        int storyIndex = (page - 1) * 10;
-        return DataSupport.where("authorId = ?", authorId)
-                .limit(10)
-                .offset(storyIndex)
-                .find(DbContentList.class);
+        if (authorId != null){
+            return DataSupport.where("authorId=?", authorId)
+                    .find(DbContentList.class);
+        }
+        return new ArrayList<>();
     }
 
     @Override
     public void loadMore() {
-        ++page;
         loadResults(false);
     }
 

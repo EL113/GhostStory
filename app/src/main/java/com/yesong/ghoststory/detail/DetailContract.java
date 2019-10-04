@@ -10,7 +10,7 @@ public interface DetailContract {
 
         void loadMore();
 
-        void loadPost(String page);
+        void loadPost();
 
         void setThumbUp(DbContentList item);
 
@@ -31,6 +31,8 @@ public interface DetailContract {
         void stopLoading();
 
         void showMaxPage();
+
+        void setContentItem(DbContentList contentItem);
     }
 
 }

@@ -7,10 +7,11 @@ package com.yesong.ghoststory.bean;
 public class ContentList {
     private String id;
     private String title;
-    private String desc;
+    private String brief;
     private String type;
     private String createTime;
     private String author;
+    private String status;
 
     public void setType(String type) {
         this.type = type;
@@ -28,12 +29,12 @@ public class ContentList {
         this.author = author;
     }
 
-    public String getDesc() {
-        return desc;
+    public String getBrief() {
+        return brief;
     }
 
-    public void setDesc(String desc) {
-        this.desc = desc;
+    public void setBrief(String brief) {
+        this.brief = brief;
     }
 
     public String getId() {
@@ -60,8 +61,11 @@ public class ContentList {
         this.createTime = createTime;
     }
 
-    @Override
-    public String toString() {
-        return "ContentList [id=" + id + ",title=" + title + ",desc=" + desc;
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
     }
 }

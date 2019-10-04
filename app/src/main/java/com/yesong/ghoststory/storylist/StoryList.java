@@ -54,7 +54,7 @@ public class StoryList extends AppCompatActivity{
 
         StoryListPresenter presenter = new StoryListPresenter(StoryList.this, storyListFragment);
         presenter.setTypeId(typeId);
-        }
+    }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {

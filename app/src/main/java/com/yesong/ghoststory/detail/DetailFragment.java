@@ -54,6 +54,7 @@ public class DetailFragment extends Fragment implements DetailContract.View {
         return view;
     }
 
+    //修改数据库数据，修改ui数据
     @Override
     public void setData(final DbContentList contentItem) {
         this.contentItem = contentItem;
@@ -171,6 +172,12 @@ public class DetailFragment extends Fragment implements DetailContract.View {
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        if (contentItem == null)
+            Log.d("yesongdh", "onCreateOptionsMenu: item is null");
+
+        if (contentItem.getAuthorId() == null)
+            Log.d("yesongdh", "onCreateOptionsMenu: authorid is null");
+
         if (contentItem.getAuthorId() != null && contentItem.getAuthorId().equals(authorId))
             inflater.inflate(R.menu.menu_delete, menu);
         super.onCreateOptionsMenu(menu, inflater);
@@ -222,6 +229,11 @@ public class DetailFragment extends Fragment implements DetailContract.View {
     @Override
     public void showMaxPage() {
         Toast.makeText(getActivity(), R.string.max_page_error, Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void setContentItem(DbContentList contentItem) {
+        this.contentItem = contentItem;
     }
 
     private String stringFilter(String text) {

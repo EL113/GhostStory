@@ -3,6 +3,7 @@ package com.yesong.ghoststory.detail;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 
 import com.yesong.ghoststory.R;
@@ -12,6 +13,7 @@ import org.litepal.crud.DataSupport;
 
 public class DetailActivity extends AppCompatActivity {
     private DetailFragment detailFragment;
+    private DetailPresenter presenter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,13 +31,20 @@ public class DetailActivity extends AppCompatActivity {
         } else {
             detailFragment = new DetailFragment();
         }
+        detailFragment.setContentItem(item);
 
-        DetailPresenter presenter = new DetailPresenter(DetailActivity.this, detailFragment);
+        presenter = new DetailPresenter(DetailActivity.this, detailFragment);
         presenter.setIdContent(item);
 
         getSupportFragmentManager().beginTransaction()
                 .replace(R.id.detail_frame, detailFragment)
                 .commit();
+    }
+
+    @Override
+    protected void onRestart() {
+        super.onRestart();
+        presenter.start();
     }
 
     @Override

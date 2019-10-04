@@ -3,6 +3,7 @@ package com.yesong.ghoststory.storylist;
 import android.content.Context;
 import android.content.Intent;
 
+import com.google.gson.JsonObject;
 import com.yesong.ghoststory.adapter.RecommendationsAdapter;
 import com.yesong.ghoststory.bean.ContentList;
 import com.yesong.ghoststory.bean.RecommendResponse;
@@ -27,6 +28,7 @@ import java.util.Locale;
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.FormBody;
+import okhttp3.MediaType;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 
@@ -34,7 +36,7 @@ public class StoryListPresenter implements StoryListContract.Presenter{
     private Context context;
     private StoryListContract.View view;
     private String typeId;
-    private int startIndex;
+    private int pageNo = 0;
     private List<DbContentList> list = new ArrayList<>();//请求的所有数据
 
     StoryListPresenter(Context context, StoryListContract.View view) {
@@ -57,13 +59,12 @@ public class StoryListPresenter implements StoryListContract.Presenter{
             view.showError("网络异常");
         }
 
-        RequestBody requestBody = new FormBody.Builder()
-                .add("startIndex", String.valueOf(startIndex))
-                .add("type", typeId)
-                .build();
+        JsonObject jsonObject = new JsonObject();
+        jsonObject.addProperty("type", typeId);
+        RequestBody requestBody = RequestBody.create(MediaType.parse("application/json"), jsonObject.toString());
 
         //获取当前时间
-        HttpUtil.post(APIUtil.storyList(), requestBody, new Callback() {
+        HttpUtil.post(APIUtil.storyList(pageNo, 20), requestBody, new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
                 view.showError("网络错误");
@@ -97,7 +98,7 @@ public class StoryListPresenter implements StoryListContract.Presenter{
                     content.setIdContent(item.getId());
                     content.setAuthor(item.getAuthor());
                     content.setTitle(item.getTitle());
-                    content.setDesc(item.getDesc());
+                    content.setDesc(item.getBrief());
                     content.setTypeName(item.getType());
                     content.setCreateTime(time);
                     content.setItemType(RecommendationsAdapter.TYPE_NORMAL);
@@ -118,7 +119,7 @@ public class StoryListPresenter implements StoryListContract.Presenter{
 
     @Override
     public void start() {
-        startIndex = 0;
+        pageNo = 0;
         loadPost(typeId, true);
         view.stopLoading();
     }
@@ -134,7 +135,7 @@ public class StoryListPresenter implements StoryListContract.Presenter{
     //加载下一页
     @Override
     public void loadMore() {
-        startIndex += 15;
+        pageNo++;
         loadPost(typeId, false);
         view.stopLoading();
     }
@@ -147,10 +148,10 @@ public class StoryListPresenter implements StoryListContract.Presenter{
         //查询数据库中的数据
         List<DbContentList> dbList = DataSupport.findAll(DbContentList.class);
 
-        if (startIndex == 0 && dbList.size() < 15){
+        if (pageNo == 0 && dbList.size() < 20){
             //第一页,完全没有数据
             addFirstPageNetworkError();
-        } else if (startIndex == 0){
+        } else if (pageNo == 0){
             //第一页,有足够的数据填充页面，加载新的数据库中的数据
             addFirstPageData(dbList);
             view.showError("网络异常");
@@ -198,7 +199,7 @@ public class StoryListPresenter implements StoryListContract.Presenter{
 
     //加载请求到的数据
     private void addRequestData(List<DbContentList> contentList) {
-        if (contentList.isEmpty() && startIndex == 0){
+        if (contentList.isEmpty() && pageNo == 0){
             addFirstPageEmptyError();
         } else if (contentList.isEmpty()){
             noMoreNewData();
@@ -231,7 +232,7 @@ public class StoryListPresenter implements StoryListContract.Presenter{
     }
 
     private void addNewData(List<DbContentList> contentList) {
-        if (startIndex == 0){
+        if (pageNo == 0){
             addFirstPageData(contentList);
             return;
         }

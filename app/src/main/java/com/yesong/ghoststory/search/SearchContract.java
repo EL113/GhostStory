@@ -21,6 +21,7 @@ public interface SearchContract {
 
         void showResults(List<DbContentList> list);
 
+        void showError(String msg);
     }
 
 }

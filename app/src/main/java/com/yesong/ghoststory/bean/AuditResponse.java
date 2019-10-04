@@ -5,7 +5,7 @@ import java.util.List;
 public class AuditResponse {
     private int code;
 
-    private List<String> resultList;
+    private List<ContentList> result;
 
     public void setCode(int code) {
         this.code = code;
@@ -15,11 +15,11 @@ public class AuditResponse {
         return code;
     }
 
-    public List<String> getResultList() {
-        return resultList;
+    public List<ContentList> getResult() {
+        return result;
     }
 
-    public void setResultList(List<String> resultList) {
-        this.resultList = resultList;
+    public void setResult(List<ContentList> result) {
+        this.result = result;
     }
 }

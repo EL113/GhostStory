@@ -1,8 +1,10 @@
 package com.yesong.ghoststory.detail;
 
 import android.content.Context;
+import android.util.Log;
 
 import com.yesong.ghoststory.bean.CommonResult;
+import com.yesong.ghoststory.bean.DetailResponse;
 import com.yesong.ghoststory.bean.DetailResult;
 import com.yesong.ghoststory.db.DbContentList;
 import com.yesong.ghoststory.homepage.CommonCallback;
@@ -26,7 +28,7 @@ public class DetailPresenter implements DetailContract.Presenter{
     private DbContentList item;
     private String textDetail = " ";
     private int allPages;
-    private int currentPage = 0;
+    private int currentPage = 1;
 
 
     DetailPresenter(Context context, DetailContract.View view) {
@@ -37,21 +39,24 @@ public class DetailPresenter implements DetailContract.Presenter{
 
     @Override
     public void start() {
+        //如果有缓存则加载数据库缓存，数据库缓存有记载页码
         boolean isContentCached = item != null && item.getText() != null;
         if (isContentCached) {
             textDetail = item.getText();
             currentPage = item.getCurrentPage();
             allPages = item.getMaxPage();
             view.setData(item);
-        } else {
-            view.showLoading();
-            loadPost("0");
-            view.stopLoading();
+            return;
         }
+
+        view.showLoading();
+        loadPost();
+        view.stopLoading();
     }
 
+    //这里只加载当前页数据
     @Override
-    public void loadPost(String page) {
+    public void loadPost() {
         boolean isNetworkAvailable = NetworkState.networkConnected(context);
         if (!isNetworkAvailable){
             textDetail = "网络异常";
@@ -60,13 +65,7 @@ public class DetailPresenter implements DetailContract.Presenter{
             return;
         }
 
-        RequestBody requestBody = new FormBody.Builder()
-                .add("id", item.getIdContent())
-                .add("type", item.getTypeName())
-                .add("page", String.valueOf(currentPage))
-                .build();
-
-        HttpUtil.post(APIUtil.content(), requestBody, new Callback() {
+        HttpUtil.get(APIUtil.content(item.getIdContent(), item.getTypeName(), String.valueOf(currentPage)), new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
                 textDetail = "Error";
@@ -80,14 +79,17 @@ public class DetailPresenter implements DetailContract.Presenter{
             public void onResponse(Call call, Response response) {
                 try {
                     String responseText = response.body().string();
-                    DetailResult detailResult = Utility.resolveResponse(responseText, DetailResult.class);
-                    if (detailResult == null) {
+                    DetailResponse detailResult = Utility.resolveResponse(responseText, DetailResponse.class);
+                    if (detailResult == null || detailResult.getCode() != 0) {
                         view.showError();
                         return;
                     }
-                    allPages = detailResult.getMaxPage();
-                    currentPage = detailResult.getCurrentPage();
-                    List<String> contentList = detailResult.getContent();
+
+                    DetailResult result = detailResult.getResult();
+                    allPages = result.getMaxPage();
+                    currentPage = result.getCurrentPage();
+                    List<String> contentList = result.getContent();
+
                     StringBuilder contentBuffer = new StringBuilder();
                     contentBuffer.append(item.getText());
                     for (String contentItem : contentList)
@@ -114,7 +116,7 @@ public class DetailPresenter implements DetailContract.Presenter{
     public void loadMore() {
         ++currentPage;
         if (currentPage <= allPages) {
-            loadPost(String.valueOf(currentPage));
+            loadPost();
         } else {
             view.showMaxPage();
         }
@@ -126,7 +128,7 @@ public class DetailPresenter implements DetailContract.Presenter{
         RequestBody requestBody = new FormBody.Builder()
                 .add("id", item.getIdContent())
                 .add("type", item.getTypeName())
-                .add("operation", item.getIsThumbUp() == 0 ? "1" : "0")
+                .add("op", item.getIsThumbUp() == 0 ? "1" : "0")
                 .build();
 
         HttpUtil.post(APIUtil.thumbUp(), requestBody, new CommonCallback(view));
@@ -138,7 +140,7 @@ public class DetailPresenter implements DetailContract.Presenter{
         RequestBody requestBody = new FormBody.Builder()
                 .add("id", item.getIdContent())
                 .add("type", item.getTypeName())
-                .add("operation", item.getIsThumbDown() == 0 ? "1" : "0")
+                .add("op", item.getIsThumbDown() == 0 ? "1" : "0")
                 .build();
 
         HttpUtil.post(APIUtil.thumbDown(), requestBody, new CommonCallback(view));
@@ -150,7 +152,7 @@ public class DetailPresenter implements DetailContract.Presenter{
         RequestBody requestBody = new FormBody.Builder()
                 .add("id", item.getIdContent())
                 .add("type", item.getTypeName())
-                .add("operation", item.getIsBookmarked() == 0 ? "1" : "0")
+                .add("op", item.getIsBookmarked() == 0 ? "1" : "0")
                 .build();
 
         HttpUtil.post(APIUtil.collect(), requestBody, new CommonCallback(view));
@@ -166,8 +168,6 @@ public class DetailPresenter implements DetailContract.Presenter{
     public void deleteStory() {
         RequestBody requestBody = new FormBody.Builder()
                 .add("id", item.getIdContent())
-                .add("type", item.getTypeName())
-                .add("authorId", item.getAuthorId())
                 .build();
 
         HttpUtil.post(APIUtil.deleteStory(), requestBody, new Callback() {
@@ -178,10 +178,15 @@ public class DetailPresenter implements DetailContract.Presenter{
 
             @Override
             public void onResponse(Call call, Response response) throws IOException {
+                if (!response.isSuccessful() || response.body() == null){
+                    view.showError();
+                    return;
+                }
                 String responseText = response.body().string();
                 CommonResult result = Utility.resolveResponse(responseText, CommonResult.class);
-                if (result.getCode() == null || result.getCode() != 0){
+                if (result == null || result.getCode() == null || result.getCode() != 0){
                     view.showError();
+                    return;
                 }
                 item.delete();
             }

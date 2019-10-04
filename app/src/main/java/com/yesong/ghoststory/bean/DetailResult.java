@@ -10,8 +10,6 @@ import java.util.List;
 
 public class DetailResult {
 
-    private int code;
-
     private int thumbUp = 0;
 
     private int thumbDown = 0;
@@ -21,14 +19,6 @@ public class DetailResult {
     private int currentPage = 0;
 
     private List<String> content;
-
-    public int getCode() {
-        return code;
-    }
-
-    public void setCode(int code) {
-        this.code = code;
-    }
 
     public int getThumbUp() {
         return thumbUp;

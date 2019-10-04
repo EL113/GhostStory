@@ -34,7 +34,7 @@ import okhttp3.Response;
 public class RecommendationsPresenter implements StoryListContract.Presenter{
     private Context context;
     private StoryListContract.View view;
-    private int startIndex = 0;
+    private int pageNo = 0;
     private List<DbContentList> list = new ArrayList<>();
 
     RecommendationsPresenter(Context context, StoryListContract.View view) {
@@ -45,14 +45,14 @@ public class RecommendationsPresenter implements StoryListContract.Presenter{
 
     @Override
     public void start() {
-        startIndex = 0;
+        pageNo = 0;
         view.showLoading();
         loadStory();
         view.stopLoading();
     }
 
     private void loadStory() {
-        if (startIndex == 0) {
+        if (pageNo == 0) {
             view.showLoading();
             list.clear();
         }
@@ -63,29 +63,21 @@ public class RecommendationsPresenter implements StoryListContract.Presenter{
             return;
         }
 
-        RequestBody requestBody = new FormBody.Builder()
-                .add("startIndex", String.valueOf(startIndex))
-                .build();
-
-        HttpUtil.post(APIUtil.getRecommendListUrl(), requestBody, new Callback() {
+        HttpUtil.get(APIUtil.getRecommendListUrl(pageNo, 25), new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
                 networkError();
+                Log.d("yesongdh", "onFailure: "+e.getMessage());
                 view.stopLoading();
             }
 
             @Override
             public void onResponse(Call call, Response response) throws IOException {
                 String responseText = response.body().string();
-                RecommendResponse requestResult = Utility.handleStoryListData(responseText, RecommendResponse.class);
+                Log.d("yesongdh", "onResponse: "+responseText);
+                RecommendResponse requestResult = Utility.resolveResponse(responseText, RecommendResponse.class);
 
-                if (requestResult == null) {
-                    networkError();
-                    view.stopLoading();
-                    return;
-                }
-
-                if (requestResult.getCode() != 0){
+                if (requestResult == null || requestResult.getCode() != 0) {
                     networkError();
                     view.stopLoading();
                     return;
@@ -101,7 +93,7 @@ public class RecommendationsPresenter implements StoryListContract.Presenter{
                     content.setIdContent(item.getId());
                     content.setAuthor(item.getAuthor());
                     content.setTitle(item.getTitle());
-                    content.setDesc(item.getDesc());
+                    content.setDesc(item.getBrief());
                     content.setTypeName(item.getType());
                     content.setCreateTime(time);
                     content.setItemType(RecommendationsAdapter.TYPE_NORMAL);
@@ -123,7 +115,7 @@ public class RecommendationsPresenter implements StoryListContract.Presenter{
 
     @Override
     public void loadMore () {
-        startIndex += 15;
+        pageNo++;
         loadStory();
         view.stopLoading();
     }
@@ -139,10 +131,10 @@ public class RecommendationsPresenter implements StoryListContract.Presenter{
     private void networkError() {
         //查询数据库中的数据
         List<DbContentList> dbList = DataSupport.findAll(DbContentList.class);
-        if (startIndex == 0 && dbList.size() < 15){
+        if (pageNo == 0 && dbList.size() < 15){
             //第一页,完全没有数据
             addFirstPageNetworkError();
-        } else if (startIndex == 0){
+        } else if (pageNo == 0){
             //第一页,有足够的数据填充页面，加载新的数据库中的数据
             addFirstPageData(dbList);
             view.showError("网络异常");
@@ -190,7 +182,7 @@ public class RecommendationsPresenter implements StoryListContract.Presenter{
 
     //加载请求到的数据
     private void addRequestData(List<DbContentList> contentList) {
-        if (contentList.isEmpty() && startIndex == 0){
+        if (contentList.isEmpty() && pageNo == 0){
             addFirstPageEmptyError();
         } else if (contentList.isEmpty()){
             noMoreNewData();
@@ -223,7 +215,7 @@ public class RecommendationsPresenter implements StoryListContract.Presenter{
     }
 
     private void addNewData(List<DbContentList> contentList) {
-        if (startIndex == 0){
+        if (pageNo == 0){
             addFirstPageData(contentList);
             return;
         }

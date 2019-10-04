@@ -1,17 +1,15 @@
 package com.yesong.ghoststory.bean;
 
-public class CommonResult {
-    private Integer code;
-
+public class DetailResponse {
+    private int code;
     private String msg;
+    private DetailResult result;
 
-    private String result;
-
-    public Integer getCode() {
+    public int getCode() {
         return code;
     }
 
-    public void setCode(Integer code) {
+    public void setCode(int code) {
         this.code = code;
     }
 
@@ -23,11 +21,11 @@ public class CommonResult {
         this.msg = msg;
     }
 
-    public String getResult() {
+    public DetailResult getResult() {
         return result;
     }
 
-    public void setResult(String result) {
+    public void setResult(DetailResult result) {
         this.result = result;
     }
 }
